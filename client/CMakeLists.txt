@@ -81,6 +81,8 @@ if (UNIX AND NOT APPLE)
         ${X11_Xxf86vm_LIB}
         GL
 	)
+
+	add_definitions(-DASSETS_PATH="../")
 endif()
 
 if(WIN32)
@@ -93,6 +95,11 @@ if(WIN32)
 		version.lib
 		winmm.lib
     )
+
+	add_definitions(-DASSETS_PATH="../")
+	if(MSVC)
+		add_definitions(-DASSETS_PATH="../../COMPILE/")
+	endif()
 endif()# WIN32
 
 

@@ -15,6 +15,8 @@
 
 using namespace viking;
 
+#define RESOLVE_ASSET_PATH(path) ASSETS_PATH##path
+
 struct Vertex
 {
 	Vertex() {}
@@ -267,8 +269,8 @@ int main(int argc, char *argv[])
 	renderer = IRenderer::createRenderer(renderingAPI);
 	renderer->start();
 
-	IGraphicsPipeline *pipeline = renderer->createGraphicsPipeline({{ShaderStage::VERTEX_SHADER, "../assets/shaders/shader.vert"},
-																	{ShaderStage::FRAGMENT_SHADER, "../assets/shaders/shader.frag"}});
+	IGraphicsPipeline *pipeline = renderer->createGraphicsPipeline({{ShaderStage::VERTEX_SHADER, RESOLVE_ASSET_PATH("assets/shaders/shader.vert")},
+																	{ShaderStage::FRAGMENT_SHADER, RESOLVE_ASSET_PATH("assets/shaders/shader.frag")}});
 
 	VertexBufferBase vertex = {
 		{{0, sizeof(glm::vec3), offsetof(Vertex, position)},
@@ -282,14 +284,14 @@ int main(int argc, char *argv[])
 	std::vector<Vertex> vertex_data;
 	std::vector<uint16_t> index_data;
 
-	LoadOBJ("../assets/models/cube.obj", index_data, vertex_data);
+	LoadOBJ(RESOLVE_ASSET_PATH("assets/models/cube.obj"), index_data, vertex_data);
 
 	IBuffer *vertex_buffer = renderer->createBuffer(vertex_data.data(), sizeof(Vertex), vertex_data.size());
 	IBuffer *index_buffer = renderer->createBuffer(index_data.data(), sizeof(uint16_t), index_data.size());
 
 	model_pool = renderer->createModelPool(&vertex, vertex_buffer, index_buffer);
 
-	ITextureBuffer *texture_buffer = loadTexture("../assets/textures/cobble.bmp");
+	ITextureBuffer *texture_buffer = loadTexture(RESOLVE_ASSET_PATH("assets/textures/cobble.bmp"));
 	model_pool->attachBuffer(texture_buffer);
 
 	IUniformBuffer *camera_buffer = renderer->createUniformBuffer(&camera, sizeof(Camera), 1, ShaderStage::VERTEX_SHADER, 1);
