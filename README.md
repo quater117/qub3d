@@ -2,7 +2,7 @@
 
 This is the main repository for the Qub3d project, just clone this, and run a a few CMake commands and you're good to go!
 
-##To Build:
+## To Build:
 Run: 
 ```
 cmake -H. -Bbuild
