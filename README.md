@@ -1,4 +1,4 @@
-[![Build Status](https://www.travis-ci.org/qub3d/qub3d.svg?branch=travis-ci)](https://www.travis-ci.org/qub3d/qub3d)
+[![Build Status](https://www.travis-ci.org/qub3d/qub3d.svg?branch=develop)](https://www.travis-ci.org/qub3d/qub3d)
 
 # WELCOME TO THE QUB³D PROJECT!
 
