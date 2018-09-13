@@ -1,0 +1,13 @@
+version: 1.0.{build}
+
+image: Visual Studio 2017
+
+configuration:
+  - Release
+
+matrix:
+  fast_finish: true
+
+build_script:
+  - cmake -H. -Bbuild
+  - cmake --build build --config "%CONFIGURATION%"
