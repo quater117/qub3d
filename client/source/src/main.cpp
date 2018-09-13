@@ -11,11 +11,10 @@
 #include <fstream>
 #include <string>
 #include <algorithm>
-#include <experimental/filesystem>
 
 using namespace viking;
 
-#define RESOLVE_ASSET_PATH(path) ASSETS_PATH##path
+#define RESOLVE_ASSET_PATH(path) ASSETS_PATH path
 
 struct Vertex
 {

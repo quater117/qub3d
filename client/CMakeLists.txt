@@ -29,7 +29,7 @@
 #
 
 # Use this version because it adds some options that we use.
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.2)
 
 project(sandblox-client)
 
@@ -82,8 +82,8 @@ if (UNIX AND NOT APPLE)
         GL
 	)
 
-	add_definitions(-DASSETS_PATH="../")
 endif()
+add_definitions(-DASSETS_PATH="../")
 
 if(WIN32)
 	list(APPEND library_dirs 
@@ -96,7 +96,6 @@ if(WIN32)
 		winmm.lib
     )
 
-	add_definitions(-DASSETS_PATH="../")
 	if(MSVC)
 		add_definitions(-DASSETS_PATH="../../COMPILE/")
 	endif()
@@ -108,6 +107,13 @@ endif()# WIN32
 set(EXECUTABLE_OUTPUT_PATH ../../COMPILE/bin)
 
 add_executable(sandblox-client ${client_sources} ${clientHeaders})
+
+set_target_properties(sandblox-client PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED ON
+    CXX_EXTENSIONS OFF
+)
+
 include_directories(${include_dirs})
 target_link_libraries(sandblox-client ${library_dirs})
 

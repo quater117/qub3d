@@ -29,7 +29,7 @@
 #
 
 # Use this version because it adds some options that we use.
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.2)
 
 project(qub3d-engine)
 
@@ -95,5 +95,12 @@ set(LIBRARY_OUTPUT_PATH ../../COMPILE/lib)
 
 # Link the engine library.
 add_library(${PROJECT_NAME} STATIC ${sources} ${headers})
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED ON
+    CXX_EXTENSIONS OFF
+)
+
 target_link_libraries(${PROJECT_NAME} ${libs})
 include_directories(${include_dirs})

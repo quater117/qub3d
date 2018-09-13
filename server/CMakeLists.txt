@@ -98,6 +98,13 @@ endif()# WIN32
 set(EXECUTABLE_OUTPUT_PATH ../../COMPILE/bin)
 
 add_executable(${PROJECT_NAME} ${server_sources} ${server_headers})
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED ON
+    CXX_EXTENSIONS OFF
+)
+
 include_directories(${include_dirs})
 target_link_libraries(${PROJECT_NAME} ${library_dirs})
 

@@ -1,0 +1,18 @@
+language: cpp
+
+os:
+  - linux
+  - osx
+
+compiler:
+  - gcc
+  - clang
+
+matrix:
+  - exclude:
+    - os: osx
+      compiler: gcc # Don't do a gcc build on OSX
+
+script:
+  - cmake -H. -Bbuild
+  - cmake --build build --config "%CONFIGURATION%"

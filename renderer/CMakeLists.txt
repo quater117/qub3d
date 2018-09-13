@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.2)
 project(Viking)
 
 # Try and find the vulkan and OpenGL librarys to decide what API's can be developed for
@@ -219,6 +219,12 @@ set(LIBRARY_OUTPUT_PATH ../../COMPILE/lib)
 
 # Create viking as a static library (compiled from the master list of source and header files)
 add_library(${PROJECT_NAME} STATIC ${source} ${headers})
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED ON
+    CXX_EXTENSIONS OFF
+)
 
 # Now link in any rendering API specific librarys
 target_link_libraries(${PROJECT_NAME} ${library_dirs})
