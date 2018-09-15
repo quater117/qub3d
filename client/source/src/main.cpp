@@ -12,6 +12,8 @@
 #include <string>
 #include <algorithm>
 
+#include "camera.hpp"
+
 using namespace viking;
 
 #define RESOLVE_ASSET_PATH(path) ASSETS_PATH path
@@ -29,26 +31,14 @@ struct Vertex
 	}
 };
 
-struct Camera
+struct CameraUniformBufferData
 {
 	glm::mat4 view;
 	glm::mat4 projection;
 };
 
 IRenderer *renderer;
-Camera camera;
 IModelPool *model_pool;
-
-void SetupCamera()
-{
-	camera.projection = glm::perspective(glm::radians(45.0f), (float)800 / (float)600, 0.1f, 1000.0f);
-
-	camera.view = glm::mat4(1.0f);
-	camera.view = glm::translate(camera.view, glm::vec3(-8.0f, 0.0f, 25.0f));
-	camera.view = glm::rotate(camera.view, glm::radians(-45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	camera.view = glm::rotate(camera.view, glm::radians(80.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	camera.view = glm::inverse(camera.view);
-}
 
 ITextureBuffer *loadTexture(const char *path)
 {
@@ -96,7 +86,7 @@ ITextureBuffer *loadTexture(const char *path)
 	return renderer->createTextureBuffer(data, width, height);
 }
 
-std::vector<std::string> Split(std::string dec, std::string str)
+std::vector<std::string> splitString(std::string dec, std::string str)
 {
 	std::vector<std::string> parts;
 	while (true)
@@ -111,13 +101,13 @@ std::vector<std::string> Split(std::string dec, std::string str)
 	return parts;
 }
 
-std::vector<std::string> Split(const char *dec, std::string str)
+std::vector<std::string> splitString(const char *dec, std::string str)
 {
 	std::string s(dec);
-	return Split(s, str);
+	return splitString(s, str);
 }
 
-void LoadOBJ(std::string location, std::vector<uint16_t> &out_vertex_index,
+void loadOBJ(std::string location, std::vector<uint16_t> &out_vertex_index,
 			 std::vector<Vertex> &out_vertices)
 {
 	std::ifstream myfile(location);
@@ -130,7 +120,7 @@ void LoadOBJ(std::string location, std::vector<uint16_t> &out_vertex_index,
 		std::vector<std::vector<std::string>> temp_faces;
 		while (getline(myfile, line))
 		{
-			std::vector<std::string> parts = Split(" ", line);
+			std::vector<std::string> parts = splitString(" ", line);
 
 			if (line.find("v ") == 0)
 			{
@@ -187,7 +177,7 @@ void LoadOBJ(std::string location, std::vector<uint16_t> &out_vertex_index,
 
 				for (int j = 0; j < face_parts.size(); j++)
 				{
-					std::vector<std::string> parts2 = Split("/", face_parts[j]);
+					std::vector<std::string> parts2 = splitString("/", face_parts[j]);
 					if (parts2.size() != 0)
 					{
 						int requested_vertex = static_cast<int>(::atof(parts2[0].c_str()) - 1);
@@ -258,7 +248,6 @@ class Chunk
 
 int main(int argc, char *argv[])
 {
-	SetupCamera();
 
 	const RenderingAPI renderingAPI = RenderingAPI::GL3;
 	const WindowingAPI windowAPI = WindowingAPI::SDL;
@@ -283,7 +272,7 @@ int main(int argc, char *argv[])
 	std::vector<Vertex> vertex_data;
 	std::vector<uint16_t> index_data;
 
-	LoadOBJ(RESOLVE_ASSET_PATH("assets/models/cube.obj"), index_data, vertex_data);
+	loadOBJ(RESOLVE_ASSET_PATH("assets/models/cube.obj"), index_data, vertex_data);
 
 	IBuffer *vertex_buffer = renderer->createBuffer(vertex_data.data(), sizeof(Vertex), vertex_data.size());
 	IBuffer *index_buffer = renderer->createBuffer(index_data.data(), sizeof(uint16_t), index_data.size());
@@ -293,16 +282,37 @@ int main(int argc, char *argv[])
 	ITextureBuffer *texture_buffer = loadTexture(RESOLVE_ASSET_PATH("assets/textures/cobble.bmp"));
 	model_pool->attachBuffer(texture_buffer);
 
-	IUniformBuffer *camera_buffer = renderer->createUniformBuffer(&camera, sizeof(Camera), 1, ShaderStage::VERTEX_SHADER, 1);
+	CameraUniformBufferData cameraUniformBuffer;
+	cameraUniformBuffer.projection = glm::perspective(45.f, 1280.f / 720.f, 0.1f, 100.f);
+	cameraUniformBuffer.view = glm::mat4();
+
+	IUniformBuffer *camera_buffer = renderer->createUniformBuffer(&cameraUniformBuffer, sizeof(CameraUniformBufferData), 1, ShaderStage::VERTEX_SHADER, 1);
 	model_pool->attachBuffer(camera_buffer);
 
 	Chunk *chunk = new Chunk();
+
+	qub3d::Camera cameraController((SDL_Window*) window->getNativeWindowHandle());
+
+	bool wasEscapeJustPressed = false,
+		 freeCursor = false;
 
 	pipeline->attachModelPool(model_pool);
 	float rot = 0.5f;
 	while (window->isRunning())
 	{
-		chunk->Update();
+		bool currentEscapeValue = SDL_GetKeyboardState(nullptr)[SDL_SCANCODE_ESCAPE];
+		if (currentEscapeValue && !wasEscapeJustPressed) 
+		{
+			freeCursor = !freeCursor;
+			SDL_ShowCursor(freeCursor);
+		}
+		wasEscapeJustPressed = currentEscapeValue;
+
+		if(!freeCursor)
+			cameraController.update(1000.f / 60.f);
+
+		cameraUniformBuffer.view = cameraController.calculateViewMatrix();
+		camera_buffer->setData();
 
 		window->poll();
 		renderer->render();

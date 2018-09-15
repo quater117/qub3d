@@ -18,6 +18,9 @@ namespace viking
 		virtual bool isRunning();
 		virtual void GetSize(int& width, int& height);
 		SDL_Window* GetSDLWindow();
+
+		virtual void* getNativeWindowHandle() { return m_window; }
+
 	protected:
 		SDLWindow(WindowingAPI windowing_api);
 		SDL_Window * m_window;

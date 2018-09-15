@@ -27,10 +27,10 @@ GLuint viking::opengl::OpenGLUniformBuffer::getUBO()
 
 void viking::opengl::OpenGLUniformBuffer::setData()
 {
-	/*glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+	glBindBuffer(GL_UNIFORM_BUFFER, ubo);
 	GLvoid* p = glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
 	memcpy(p, &m_dataPtr, m_bufferSize);
-	glUnmapBuffer(GL_UNIFORM_BUFFER);*/
+	glUnmapBuffer(GL_UNIFORM_BUFFER);
 }
 
 void viking::opengl::OpenGLUniformBuffer::setData(unsigned int count)
