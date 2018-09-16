@@ -1,7 +1,7 @@
 #include <viking/opengl/OpenGLModelPool.hpp>
 #include <viking/opengl/OpenGLModel.hpp>
 #include <viking/opengl/OpenGLUniformBuffer.hpp>
-#include <viking/opengl/glad.h>
+#include <viking/opengl/OpenGL.hpp>
 
 using namespace viking::opengl;
 using namespace viking;

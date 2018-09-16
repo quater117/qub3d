@@ -1,6 +1,6 @@
 #pragma once
 
-#include <viking/opengl/glad.h>
+#include <viking/opengl/OpenGL.hpp>
 #include <viking/IModelPool.hpp>
 #include <viking/opengl/OpenGLModel.hpp>
 #include <viking/opengl/OpenGLUniformBuffer.hpp>

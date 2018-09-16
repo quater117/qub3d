@@ -2,7 +2,7 @@
 
 #include <viking/IGraphicsPipeline.hpp>
 #include <viking/opengl/OpenGLModelPool.hpp>
-#include <viking/opengl/glad.h>
+#include <viking/opengl/OpenGL.hpp>
 
 namespace viking
 {

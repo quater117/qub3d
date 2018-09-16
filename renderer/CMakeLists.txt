@@ -1,6 +1,16 @@
 cmake_minimum_required(VERSION 3.2)
 project(Viking)
 
+set(libdeps ${CMAKE_CURRENT_LIST_DIR}/../libdeps)
+
+set(lib_includes
+	${libdeps}/glew/include
+)
+
+set(libs
+	glew_s
+)
+
 # Try and find the vulkan and OpenGL librarys to decide what API's can be developed for
 # E.g Both Vulkan and OpenGL Runtimes/Drivers should already be present on user machines
 find_package(Vulkan)
@@ -70,7 +80,6 @@ if( ${hasOpenGL} )
         source/src/opengl/OpenGLModel.cpp
         source/src/opengl/OpenGLTextureBuffer.cpp
 		source/src/opengl/OpenGLUniformBuffer.cpp
-        source/src/opengl/glad.c
     )
 
     set(opengl_headers
@@ -82,7 +91,7 @@ if( ${hasOpenGL} )
         source/include/viking/opengl/OpenGLModel.hpp
         source/include/viking/opengl/OpenGLUniformBuffer.hpp
         source/include/viking/opengl/OpenGLTextureBuffer.hpp
-        source/include/viking/opengl/glad.h
+		source/include/viking/opengl/OpenGL.hpp
     )
 
     # Add the OpenGL specific code files to the list of files to be compiled.
@@ -197,7 +206,6 @@ if(UNIX)
 		${X11_LIBRARIES}
 		${X11_Xxf86vm_LIB}
 		SDL2-static
-		SDL2main
 	)
 	if(${hasVulkan})
 		set(library_dirs 
@@ -214,6 +222,10 @@ endif()
 # etc...
 
 include_directories(source/include ../libdeps/SDL2/include)
+
+if(hasOpenGL)
+	include_directories(${lib_includes})
+endif()
 
 set(LIBRARY_OUTPUT_PATH ../../COMPILE/lib)
 
@@ -236,4 +248,5 @@ endif()
 
 if(hasOpenGL)
     target_link_libraries(${PROJECT_NAME} OpenGL::GL)
+	target_link_libraries(${PROJECT_NAME} ${libs})
 endif()

@@ -1,4 +1,5 @@
 #include <viking/opengl/OpenGLUniformBuffer.hpp>
+#include <cstring>
 
 using namespace viking::opengl;
 using namespace viking;

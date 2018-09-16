@@ -1,6 +1,6 @@
 #pragma once
 
-#include <viking/opengl/glad.h>
+#include <viking/opengl/OpenGL.hpp>
 #include <viking/IUniformBuffer.hpp>
 
 namespace viking

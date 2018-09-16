@@ -4,7 +4,7 @@
 #include <viking/opengl/OpenGLBuffer.hpp>
 #include <viking/opengl/OpenGLUniformBuffer.hpp>
 #include <viking/opengl/OpenGLTextureBuffer.hpp>
-#include <viking/opengl/glad.h>
+#include <viking/opengl/OpenGL.hpp>
 
 using namespace viking::opengl;
 using namespace viking;
