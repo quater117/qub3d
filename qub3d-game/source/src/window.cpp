@@ -28,70 +28,45 @@
 *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "camera.hpp"
-
-#include <glm/gtc/matrix_transform.hpp>
+#include <qub3d/window.hpp>
 
 using namespace qub3d;
 
-float MOUSE_SENSITIVITY = 0.000075f;
-float MOVE_SPEED = 0.01f;
-
-Camera::Camera(SDL_Window *window): m_window(window)
+Window::Window(const std::string& title, unsigned int w, unsigned int h): m_isRunning(true)
 {
-	SDL_ShowCursor(SDL_FALSE);
+	m_window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_OPENGL);
+	m_context = SDL_GL_CreateContext(m_window);
 
-	m_position = glm::vec3(0.f, 0.f, 0.f);
-	m_direction = glm::vec3(0.f, 0.f, 0.f);
-	m_rotation = glm::vec3(0.f, 0.f, 0.f);
-	m_up = glm::vec3(0.f, 0.f, 0.f);
+	SDL_ShowWindow(m_window);
 }
 
-void Camera::update(float dt) 
+Window::~Window()
 {
-	int mx, my, w, h;
-	
-	SDL_GetMouseState(&mx, &my);
-	SDL_GetWindowSize(m_window, &w, &h);
-	SDL_WarpMouseInWindow(m_window, w / 2, h / 2);
-
-	m_rotation.x += MOUSE_SENSITIVITY * dt * (float)(w / 2.f - mx);
-	m_rotation.y += MOUSE_SENSITIVITY * dt * (float)(h / 2.f - my);
-
-	const float HALF_PI = M_PI / 2.f;
-
-	m_rotation.y = glm::clamp(m_rotation.y, -HALF_PI, HALF_PI);
-
-	m_direction.x = std::cos(m_rotation.y) * std::sin(m_rotation.x);
-	m_direction.y = std::sin(m_rotation.y);
-	m_direction.z = std::cos(m_rotation.y) * std::cos(m_rotation.x);
-
-	glm::vec3 right(
-		std::sin(m_rotation.x - M_PI / 2.f),
-		0.f,
-		std::cos(m_rotation.x - M_PI / 2.f)
-	);
-
-	m_up = glm::cross(right, m_direction);
-
-	const Uint8* keys = SDL_GetKeyboardState(nullptr);
-	
-	if (keys[SDL_SCANCODE_W])
-		m_position += m_direction * dt * MOVE_SPEED;
-	
-	if (keys[SDL_SCANCODE_S])
-		m_position -= m_direction * dt * MOVE_SPEED;
-
-	if (keys[SDL_SCANCODE_D])
-		m_position += right * dt * MOVE_SPEED;
-
-	if (keys[SDL_SCANCODE_A])
-		m_position -= right * dt * MOVE_SPEED;
+	SDL_DestroyWindow(m_window);
+	SDL_GL_DeleteContext(m_context);
 }
 
-glm::mat4 Camera::calculateViewMatrix() const
+void Window::swapBuffers()
 {
-	glm::vec3 centre = m_position + m_direction;
+	SDL_GL_SwapWindow(m_window);
+}
 
-	return glm::lookAt(m_position, centre, m_up);
+void Window::pollEvents()
+{
+	SDL_Event e;
+	while (SDL_PollEvent(&e) > 0)
+	{
+		if (e.type == SDL_QUIT) 
+			m_isRunning = false;
+
+		for (const EventHandler& handleEvent : m_eventHandlers)
+		{
+			handleEvent(e);
+		}
+	}
+}
+
+void Window::addEventHandler(EventHandler handler)
+{
+	m_eventHandlers.push_back(handler);
 }

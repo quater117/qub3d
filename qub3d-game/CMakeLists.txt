@@ -38,13 +38,15 @@ project(qub3d-game)
 set(libdeps ${CMAKE_CURRENT_LIST_DIR}/../libdeps)
 
 set(source_dir ${PROJECT_SOURCE_DIR}/source/src)
-set(headers_dir ${PROJECT_SOURCE_DIR}/source/include)
+set(headers_dir ${PROJECT_SOURCE_DIR}/source/include/qub3d)
 
 set(client_sources
   ${source_dir}/main.cpp
+  ${source_dir}/window.cpp
 )
 
 set(clientHeaders
+	${headers_dir}/window.hpp
 )
 
 if(APPLE)

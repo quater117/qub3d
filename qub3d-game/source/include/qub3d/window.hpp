@@ -30,26 +30,39 @@
 
 #pragma once
 
-#include <glm/mat4x4.hpp>
 #include <SDL.h>
+#include <SDL_opengl.h>
 
-namespace qub3d 
+#include <string>
+#include <functional>
+#include <vector>
+
+namespace qub3d
 {
-	class Camera 
+	typedef std::function<void(SDL_Event& e)> EventHandler;
+
+	class Window
 	{
 	public:
-		Camera(SDL_Window* window);
 
-		glm::mat4 calculateViewMatrix() const;
-		void update(float dt);
-	
-	public:
-		glm::mat4 projectionMatrix;
-	
+		Window(const std::string& title, unsigned int w, unsigned int h);
+
+		~Window();
+
+		inline SDL_Window *getSDLWindow() const { return m_window; }
+
+		void swapBuffers();
+		void pollEvents();
+
+		void addEventHandler(EventHandler eventHandler);
+
+		inline bool isRunning() const { return m_isRunning; }
+
 	private:
-		glm::vec3 m_position, m_direction, m_up;
-		glm::vec2 m_rotation;
+		SDL_Window * m_window;
+		SDL_GLContext m_context;
+		bool m_isRunning;
 
-		SDL_Window *m_window;
+		std::vector<EventHandler> m_eventHandlers;
 	};
 }
