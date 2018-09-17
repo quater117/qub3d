@@ -28,38 +28,22 @@
 *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#pragma once
+#include <qub3d/io.hpp>
 
 #include <SDL.h>
-
-#include <string>
-#include <functional>
 #include <vector>
 
-namespace qub3d
+using namespace qub3d;
+
+std::string File::readAllText(const std::string& filepath)
 {
-	typedef std::function<void(SDL_Event& e)> EventHandler;
+	SDL_RWops *rwops = SDL_RWFromFile(filepath.c_str(), "r");
+	size_t fileSize = SDL_RWsize(rwops);
 
-	class Window
-	{
-	public:
-		Window(const std::string& title, unsigned int w, unsigned int h);
-		~Window();
+	std::string text;
+	text.resize(fileSize);
 
-		inline SDL_Window *getSDLWindow() const { return m_window; }
+	SDL_RWread(rwops, (void*)text.data(), sizeof(char), fileSize);
 
-		void swapBuffers();
-		void pollEvents();
-
-		void addEventHandler(EventHandler eventHandler);
-
-		inline bool isRunning() const { return m_isRunning; }
-
-	private:
-		SDL_Window * m_window;
-		SDL_GLContext m_context;
-		bool m_isRunning;
-
-		std::vector<EventHandler> m_eventHandlers;
-	};
+	return text;
 }

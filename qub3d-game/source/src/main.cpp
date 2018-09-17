@@ -28,9 +28,9 @@
 *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <SDL.h>
-
 #include <qub3d/window.hpp>
+#include <qub3d/shader_pipeline.hpp>
+#include <SDL.h>
 
 int main(int argc, char** argv)
 {
@@ -49,6 +49,11 @@ int main(int argc, char** argv)
 		}
 	});
 
+	qub3d::ShaderPipeline pipeline;
+	pipeline.addStage(qub3d::ShaderPipelineStage::VERTEX, "assets/shaders/basic_vertex.glsl");
+	pipeline.addStage(qub3d::ShaderPipelineStage::FRAGMENT, "assets/shaders/basic_fragment.glsl");
+	pipeline.build();
+	
 	while (window.isRunning())
 	{
 		window.pollEvents();

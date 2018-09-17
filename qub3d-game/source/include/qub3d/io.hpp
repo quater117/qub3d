@@ -30,36 +30,13 @@
 
 #pragma once
 
-#include <SDL.h>
-
 #include <string>
-#include <functional>
-#include <vector>
 
 namespace qub3d
 {
-	typedef std::function<void(SDL_Event& e)> EventHandler;
-
-	class Window
+	class File
 	{
 	public:
-		Window(const std::string& title, unsigned int w, unsigned int h);
-		~Window();
-
-		inline SDL_Window *getSDLWindow() const { return m_window; }
-
-		void swapBuffers();
-		void pollEvents();
-
-		void addEventHandler(EventHandler eventHandler);
-
-		inline bool isRunning() const { return m_isRunning; }
-
-	private:
-		SDL_Window * m_window;
-		SDL_GLContext m_context;
-		bool m_isRunning;
-
-		std::vector<EventHandler> m_eventHandlers;
+		static std::string readAllText(const std::string& filepath);
 	};
 }

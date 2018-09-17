@@ -30,36 +30,34 @@
 
 #pragma once
 
-#include <SDL.h>
+#include <qub3d/opengl.hpp>
 
 #include <string>
-#include <functional>
 #include <vector>
 
 namespace qub3d
 {
-	typedef std::function<void(SDL_Event& e)> EventHandler;
+	enum class ShaderPipelineStage
+	{
+		VERTEX = GL_VERTEX_SHADER,
+		FRAGMENT = GL_FRAGMENT_SHADER
+	};
 
-	class Window
+	class ShaderPipeline
 	{
 	public:
-		Window(const std::string& title, unsigned int w, unsigned int h);
-		~Window();
+		void addStage(ShaderPipelineStage stage, const std::string& shaderFilepath);
+		void build();
 
-		inline SDL_Window *getSDLWindow() const { return m_window; }
+		void bind();
+		void unbind();
 
-		void swapBuffers();
-		void pollEvents();
+		inline GLuint getProgramID() const { return m_program; }
 
-		void addEventHandler(EventHandler eventHandler);
-
-		inline bool isRunning() const { return m_isRunning; }
-
+		void destroy();
 	private:
-		SDL_Window * m_window;
-		SDL_GLContext m_context;
-		bool m_isRunning;
+		GLuint m_program;
 
-		std::vector<EventHandler> m_eventHandlers;
+		std::vector<GLuint> m_shaderIDs;
 	};
 }

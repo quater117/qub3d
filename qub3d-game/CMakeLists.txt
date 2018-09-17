@@ -41,13 +41,17 @@ set(source_dir ${PROJECT_SOURCE_DIR}/source/src)
 set(headers_dir ${PROJECT_SOURCE_DIR}/source/include/qub3d)
 
 set(client_sources
-  ${source_dir}/main.cpp
-  ${source_dir}/window.cpp
+	${source_dir}/main.cpp
+	${source_dir}/window.cpp
+	${source_dir}/shader_pipeline.cpp
+	${source_dir}/io.cpp
 )
 
 set(clientHeaders
 	${headers_dir}/window.hpp
 	${headers_dir}/opengl.hpp
+	${headers_dir}/shader_pipeline.hpp
+	${headers_dir}/io.hpp
 )
 
 if(APPLE)
@@ -83,7 +87,6 @@ if (UNIX AND NOT APPLE)
 	)
 
 endif()
-add_definitions(-DASSETS_PATH="../")
 
 if(WIN32)
 	list(APPEND library_dirs 
@@ -95,16 +98,23 @@ if(WIN32)
 		version.lib
 		winmm.lib
     )
-
-	if(MSVC)
-		add_definitions(-DASSETS_PATH="../../COMPILE/")
-	endif()
 endif()# WIN32
 
 
 # Link the "SandBlox" binary.
 
 add_executable(qub3d-game ${client_sources} ${clientHeaders})
+
+file(GLOB shaders ${CMAKE_CURRENT_SOURCE_DIR}/../assets/shaders/*.glsl)
+
+add_custom_target(assets
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory
+                   ${CMAKE_CURRENT_SOURCE_DIR}/../assets ${CMAKE_CURRENT_BINARY_DIR}/assets
+				   SOURCES ${shaders}
+)
+source_group("shaders" FILES ${shaders})
+
+add_dependencies(qub3d-game assets)
 
 set_target_properties(qub3d-game PROPERTIES
     CXX_STANDARD 11

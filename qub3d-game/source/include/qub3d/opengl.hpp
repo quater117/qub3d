@@ -31,3 +31,8 @@
 #pragma once
 
 #include <GL/glew.h>
+ 
+#ifndef QTO_GLENUM
+	#define QTO_GLENUM(e) \
+		static_cast<GLenum>(e)
+#endif

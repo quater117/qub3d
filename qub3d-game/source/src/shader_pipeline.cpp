@@ -28,38 +28,65 @@
 *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#pragma once
+#include <qub3d/shader_pipeline.hpp>
+#include <qub3d/io.hpp>
 
-#include <SDL.h>
+using namespace qub3d;
 
-#include <string>
-#include <functional>
-#include <vector>
-
-namespace qub3d
+void ShaderPipeline::addStage(ShaderPipelineStage stage, const std::string& shaderFilepath)
 {
-	typedef std::function<void(SDL_Event& e)> EventHandler;
+	std::string fileText = File::readAllText(shaderFilepath);
+	const char* txt = fileText.c_str();
 
-	class Window
+	GLuint shader = glCreateShader(QTO_GLENUM(stage));
+	glShaderSource(shader, 1, &txt, nullptr);
+	glCompileShader(shader);
+
+	const int INFO_LOG_SIZE = 512;
+
+	int success;
+	char infoLog[INFO_LOG_SIZE];
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+
+	if (!success)
 	{
-	public:
-		Window(const std::string& title, unsigned int w, unsigned int h);
-		~Window();
+		glGetShaderInfoLog(shader, INFO_LOG_SIZE, NULL, infoLog);
+		printf("Shader compile error! %s\n", infoLog);
+	}
 
-		inline SDL_Window *getSDLWindow() const { return m_window; }
+	m_shaderIDs.push_back(shader);
+}
 
-		void swapBuffers();
-		void pollEvents();
+void ShaderPipeline::destroy()
+{
+	glDeleteProgram(m_program);
+}
 
-		void addEventHandler(EventHandler eventHandler);
+void ShaderPipeline::build()
+{
+	m_program = glCreateProgram();
 
-		inline bool isRunning() const { return m_isRunning; }
+	for (GLuint shader : m_shaderIDs)
+	{
+		glAttachShader(m_program, shader);
+	}
 
-	private:
-		SDL_Window * m_window;
-		SDL_GLContext m_context;
-		bool m_isRunning;
+	glLinkProgram(m_program);
+	
+	for (GLuint shader : m_shaderIDs)
+	{
+		glDetachShader(m_program, shader);
+		glDeleteShader(shader);
+	}
+	m_shaderIDs.clear();
+}
 
-		std::vector<EventHandler> m_eventHandlers;
-	};
+void ShaderPipeline::bind()
+{
+	glUseProgram(m_program);
+}
+
+void ShaderPipeline::unbind()
+{
+	glUseProgram(0);
 }
