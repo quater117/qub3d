@@ -28,49 +28,6 @@
 *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <qub3d/window.hpp>
-#include <qub3d/opengl.hpp>
+#pragma once
 
-using namespace qub3d;
-
-Window::Window(const std::string& title, unsigned int w, unsigned int h): m_isRunning(true)
-{
-	m_window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_OPENGL);
-	m_context = SDL_GL_CreateContext(m_window);
-
-	glewExperimental = GL_TRUE;
-	glewInit();
-
-	SDL_ShowWindow(m_window);
-}
-
-Window::~Window()
-{
-	SDL_DestroyWindow(m_window);
-	SDL_GL_DeleteContext(m_context);
-}
-
-void Window::swapBuffers()
-{
-	SDL_GL_SwapWindow(m_window);
-}
-
-void Window::pollEvents()
-{
-	SDL_Event e;
-	while (SDL_PollEvent(&e) > 0)
-	{
-		if (e.type == SDL_QUIT) 
-			m_isRunning = false;
-
-		for (const EventHandler& handleEvent : m_eventHandlers)
-		{
-			handleEvent(e);
-		}
-	}
-}
-
-void Window::addEventHandler(EventHandler handler)
-{
-	m_eventHandlers.push_back(handler);
-}
+#include <GL/glew.h>

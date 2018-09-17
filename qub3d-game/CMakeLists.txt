@@ -47,6 +47,7 @@ set(client_sources
 
 set(clientHeaders
 	${headers_dir}/window.hpp
+	${headers_dir}/opengl.hpp
 )
 
 if(APPLE)
