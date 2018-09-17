@@ -4,8 +4,5 @@ project(qub3d)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 add_subdirectory(libdeps)
-add_subdirectory(engine)
-add_subdirectory(client)
-add_subdirectory(launcher)
-add_subdirectory(renderer)
-add_subdirectory(server)
+add_subdirectory(qub3d-game)
+

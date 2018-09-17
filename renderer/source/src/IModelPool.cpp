@@ -1,1 +1,0 @@
-#include <viking/IModelPool.hpp>
