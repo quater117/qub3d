@@ -58,13 +58,36 @@ int main(int argc, char** argv)
 	
 	float vertices[] = {
 		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f,  0.5f, 0.0f
+		-0.5f, 0.5f, 0.0f,
+		0.5f,  0.5f, 0.0f,
+		0.5f, -0.5f, 0.0f
+	};
+
+	unsigned int indices[] = {
+		0, 1, 2,
+		0, 2, 3
+	};
+
+	struct Mesh {
+		std::vector<glm::vec3> vertices;
+	};
+
+	Mesh mesh;
+	mesh.vertices = {
+		{ -0.5f, -0.5f, 0.0f },
+		{ -0.5f, 0.5f,  0.0f },
+		{ 0.5f,  0.5f,  0.0f },
+		{ 0.5f, -0.5f,  0.0f }
 	};
 
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
+
+	unsigned int EBO;
+	glGenBuffers(1, &EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	unsigned int VBO;
 	glGenBuffers(1, &VBO);
@@ -90,7 +113,9 @@ int main(int argc, char** argv)
 
 		glClearColor(198 / 255.f, 220/255.f, 255/255.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	
 		window.swapBuffers();
 	}
 
