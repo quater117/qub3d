@@ -37,7 +37,8 @@ set(imgui_sources
 	ImGUI/examples/imgui_impl_sdl.h
 	ImGUI/examples/imgui_impl_sdl.cpp
 )
-include_directories(ImGui)
+
+include_directories(ImGUI)
 include_directories(SDL2/include)
 include_directories(glew/include)
 add_library(imgui ${imgui_sources})
