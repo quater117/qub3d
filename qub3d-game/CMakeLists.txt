@@ -45,6 +45,7 @@ set(client_sources
 	${source_dir}/window.cpp
 	${source_dir}/shader_pipeline.cpp
 	${source_dir}/io.cpp
+	${source_dir}/imgui.cpp
 )
 
 set(clientHeaders
@@ -52,6 +53,7 @@ set(clientHeaders
 	${headers_dir}/opengl.hpp
 	${headers_dir}/shader_pipeline.hpp
 	${headers_dir}/io.hpp
+	${headers_dir}/imgui.hpp
 )
 
 if(APPLE)

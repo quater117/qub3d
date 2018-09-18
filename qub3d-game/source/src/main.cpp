@@ -32,7 +32,7 @@
 #include <qub3d/shader_pipeline.hpp>
 #include <SDL.h>
 
-#include <imgui.h>
+#include <qub3d/imgui.hpp>
 
 int main(int argc, char** argv)
 {
@@ -75,10 +75,19 @@ int main(int argc, char** argv)
 
 	pipeline.bind();
 
+	glm::vec3 testVec3(0);
+	glm::mat4 testMat4(1);
+
 	while (window.isRunning())
 	{
 		window.pollEvents();
-		ImGui::Text("Hello World!");
+		
+		ImGui::Begin("ImGui Extensions Examples");
+			ImGui::InputVector3("Test Vector", &testVec3);
+			ImGui::NewLine();
+			ImGui::InputMatrix4x4("Test Matrix", &testMat4);
+		ImGui::End();
+
 		glClearColor(198 / 255.f, 220/255.f, 255/255.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
