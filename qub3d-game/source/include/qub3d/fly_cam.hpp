@@ -28,75 +28,29 @@
 *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#pragma once
+
 #include <qub3d/window.hpp>
-#include <qub3d/opengl.hpp>
 
-#include <imgui.h>
-#include <examples/imgui_impl_sdl.h>
-#include <examples/imgui_impl_opengl3.h>
+#include <glm/glm.hpp>
 
-
-using namespace qub3d;
-
-Window::Window(const std::string& title, unsigned int w, unsigned int h) : m_isRunning(true)
+namespace qub3d
 {
-	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
-
-	m_window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_OPENGL);
-	m_context = SDL_GL_CreateContext(m_window);
-
-	glewExperimental = GL_TRUE;
-	glewInit();
-
-	glEnable(GL_MULTISAMPLE);
-
-	SDL_ShowWindow(m_window);
-
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGui_ImplSDL2_InitForOpenGL(m_window, m_context);
-	ImGui_ImplOpenGL3_Init();
-
-	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-}
-
-Window::~Window()
-{
-	SDL_DestroyWindow(m_window);
-	SDL_GL_DeleteContext(m_context);
-}
-
-void Window::swapBuffers()
-{
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	SDL_GL_SwapWindow(m_window);
-}
-
-void Window::pollEvents()
-{
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplSDL2_NewFrame(m_window);
-	ImGui::NewFrame();
-
-	SDL_Event e;
-	while (SDL_PollEvent(&e) > 0)
+	class FlyCamera
 	{
-		if (e.type == SDL_QUIT) 
-			m_isRunning = false;
+	public:
+		FlyCamera(Window& window);
 
-		for (const EventHandler& handleEvent : m_eventHandlers)
-		{
-			handleEvent(e);
-		}
+		glm::mat4 calculateViewMatrix() const;
 
-		ImGui_ImplSDL2_ProcessEvent(&e);
-	}
-}
+		void processInputs();
+		void tick(float dt);
 
-void Window::addEventHandler(EventHandler handler)
-{
-	m_eventHandlers.push_back(handler);
+		bool enabled;
+	private:
+		Window& m_window;
+
+		glm::vec3 m_position, m_direction, m_up;
+		glm::vec2 m_rotation;
+	};
 }

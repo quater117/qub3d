@@ -46,6 +46,7 @@ set(client_sources
 	${source_dir}/shader_pipeline.cpp
 	${source_dir}/io.cpp
 	${source_dir}/imgui.cpp
+	${source_dir}/fly_cam.cpp
 )
 
 set(clientHeaders
@@ -54,6 +55,7 @@ set(clientHeaders
 	${headers_dir}/shader_pipeline.hpp
 	${headers_dir}/io.hpp
 	${headers_dir}/imgui.hpp
+	${headers_dir}/fly_cam.hpp
 )
 
 if(APPLE)

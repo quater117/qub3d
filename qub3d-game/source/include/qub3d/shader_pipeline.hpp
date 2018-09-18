@@ -34,6 +34,9 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
+
+#include <glm/glm.hpp>
 
 namespace qub3d
 {
@@ -55,9 +58,14 @@ namespace qub3d
 		inline GLuint getProgramID() const { return m_program; }
 
 		void destroy();
+
+		GLuint getUniformLocation(const std::string& uniformName);
+		void setUniform(const std::string& uniformName, const glm::mat4& matrix);
+
 	private:
 		GLuint m_program;
 
 		std::vector<GLuint> m_shaderIDs;
+		std::unordered_map<std::string, GLuint> m_uniformLocationMap;
 	};
 }

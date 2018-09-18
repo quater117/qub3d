@@ -31,7 +31,39 @@
 #include <qub3d/shader_pipeline.hpp>
 #include <qub3d/io.hpp>
 
+#include <glm/gtc/type_ptr.hpp>
+
 using namespace qub3d;
+
+GLuint ShaderPipeline::getUniformLocation(const std::string& uniformName)
+{
+	auto it = m_uniformLocationMap.find(uniformName);
+	
+	// We've already cached this uniform location
+	if (it != m_uniformLocationMap.end())
+	{
+		return (*it).second;
+	}
+	else
+	{
+		GLuint location = glGetUniformLocation(m_program, uniformName.c_str());
+		if (location >= 0)
+		{
+			m_uniformLocationMap[uniformName] = location;
+			return location;
+		}
+		else
+		{
+			printf("Cannot find uniform: %s", uniformName.c_str());
+			return location;
+		}
+	}
+}
+
+void ShaderPipeline::setUniform(const std::string& uniformName, const glm::mat4& matrix)
+{
+	glUniformMatrix4fv(this->getUniformLocation(uniformName), 1, GL_FALSE, glm::value_ptr(matrix));
+}
 
 void ShaderPipeline::addStage(ShaderPipelineStage stage, const std::string& shaderFilepath)
 {

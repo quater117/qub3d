@@ -33,6 +33,9 @@
 #include <SDL.h>
 
 #include <qub3d/imgui.hpp>
+#include <qub3d/fly_cam.hpp>
+
+#include <glm/gtc/matrix_transform.hpp>
 
 int main(int argc, char** argv)
 {
@@ -40,32 +43,48 @@ int main(int argc, char** argv)
 	
 	qub3d::Window window("Qub3d Game", 1280, 720);
 
-	// Handle custom SDL events here.
-	window.addEventHandler([&](SDL_Event& e) {
-		if (e.type == SDL_KEYDOWN) {
-			switch (e.key.keysym.scancode) {
-			case SDL_SCANCODE_SPACE:
-				printf("Space has been pressed!\n");
-				break;
-			}
-		}
-	});
-
 	qub3d::ShaderPipeline pipeline;
 	pipeline.addStage(qub3d::ShaderPipelineStage::VERTEX, "assets/shaders/basic_vertex.glsl");
 	pipeline.addStage(qub3d::ShaderPipelineStage::FRAGMENT, "assets/shaders/basic_fragment.glsl");
 	pipeline.build();
 	
 	float vertices[] = {
-		-0.5f, -0.5f, 0.0f,
-		-0.5f, 0.5f, 0.0f,
-		0.5f,  0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f
+		// front
+		-1.0, -1.0,  1.0,
+		1.0, -1.0,  1.0,
+		1.0,  1.0,  1.0,
+		-1.0,  1.0,  1.0,
+		// back
+		-1.0, -1.0, -1.0,
+		1.0, -1.0, -1.0,
+		1.0,  1.0, -1.0,
+		-1.0,  1.0, -1.0,
 	};
 
 	unsigned int indices[] = {
+		// front
 		0, 1, 2,
-		0, 2, 3
+		2, 3, 0,
+		// right
+		1, 5, 6,
+		6, 2, 1,
+		// back
+		7, 6, 5,
+		5, 4, 7,
+		// left
+		4, 0, 3,
+		3, 7, 4,
+		// bottom
+		4, 5, 1,
+		1, 0, 4,
+		// top
+		3, 2, 6,
+		6, 7, 3,
+	};
+
+	struct Material {
+		glm::vec4 color;
+
 	};
 
 	struct Mesh {
@@ -98,13 +117,23 @@ int main(int argc, char** argv)
 
 	pipeline.bind();
 
+	qub3d::FlyCamera camera(window);
+
 	glm::vec3 testVec3(0);
 	glm::mat4 testMat4(1);
+	
+	glm::mat4 projection = glm::perspective(45.f, 1280.f / 720.f, 0.1f, 100.f);
+
+	glEnable(GL_DEPTH_TEST);
 
 	while (window.isRunning())
 	{
 		window.pollEvents();
 		
+		camera.tick(1.f / 60.f);
+
+		pipeline.setUniform("mvp", projection * camera.calculateViewMatrix());
+
 		ImGui::Begin("ImGui Extensions Examples");
 			ImGui::InputVector3("Test Vector", &testVec3);
 			ImGui::NewLine();
@@ -112,9 +141,9 @@ int main(int argc, char** argv)
 		ImGui::End();
 
 		glClearColor(198 / 255.f, 220/255.f, 255/255.f, 1.f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(unsigned int), GL_UNSIGNED_INT, 0);
 	
 		window.swapBuffers();
 	}
