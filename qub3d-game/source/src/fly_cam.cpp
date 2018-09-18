@@ -58,8 +58,8 @@ glm::mat4 FlyCamera::calculateViewMatrix() const
 	return glm::lookAt(m_position, centre, m_up);
 }
 
-const float MOUSE_SENSITIVITY = 0.05f;
-const float MOVE_SPEED = 2.f;
+const float MOUSE_SENSITIVITY = 0.075f;
+const float MOVE_SPEED = 6.f;
 
 void FlyCamera::tick(float dt)
 {
