@@ -1,4 +1,4 @@
-[![Build Status](https://www.travis-ci.org/qub3d/qub3d.svg?branch=develop)](https://www.travis-ci.org/qub3d/qub3d)
+[![Build Status](https://www.travis-ci.org/qub3d/qub3d.svg)](https://www.travis-ci.org/qub3d/qub3d)
 [![Build status](https://ci.appveyor.com/api/projects/status/s5ier6fjuwpv5qor?svg=true)](https://ci.appveyor.com/project/qub3d-bot/qub3d)
 
 # WELCOME TO THE QUB³D PROJECT!
