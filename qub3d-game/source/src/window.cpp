@@ -60,6 +60,8 @@ Window::Window(const std::string& title, unsigned int w, unsigned int h) : m_isR
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+
+	SDL_GL_SetSwapInterval(1);
 }
 
 Window::~Window()

@@ -125,16 +125,8 @@ int main(int argc, char** argv)
 	glm::mat4 projection = glm::perspective(45.f, 1280.f / 720.f, 0.1f, 100.f);
 
 	glEnable(GL_DEPTH_TEST);
-	
-	const int TICKS_PER_SECOND = 60;
-	const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
-	const int MAX_FRAMESKIP = 10;
-
-	unsigned int nextTicks = SDL_GetTicks();
-	int loops;
 
 	unsigned int lastTicks = SDL_GetTicks();
-
 	while (window.isRunning())
 	{
 		window.pollEvents();
@@ -142,14 +134,8 @@ int main(int argc, char** argv)
 		unsigned int currentTicks = SDL_GetTicks();
 		float dt = (currentTicks - lastTicks) / 1000.f;	// the "/ 1000" here converts the delta time from milliseconds to seconds.
 		
-		loops = 0;
-		while (SDL_GetTicks() > nextTicks && loops < MAX_FRAMESKIP) {
-			camera.tick(dt);
-			pipeline.setUniform("mvp", projection * camera.calculateViewMatrix());
-
-			nextTicks += SKIP_TICKS;
-			loops++;
-		}
+		camera.tick(dt);
+		pipeline.setUniform("mvp", projection * camera.calculateViewMatrix());
 
 		ImGui::Begin("ImGui Extensions Examples");
 			ImGui::InputVector3("Test Vector", &testVec3);
@@ -165,6 +151,7 @@ int main(int argc, char** argv)
 		window.swapBuffers();
 
 		lastTicks = currentTicks;
+		SDL_Delay(1000 / 60.f);
 	}
 
 	SDL_Quit();
