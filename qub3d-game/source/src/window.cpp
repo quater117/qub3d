@@ -31,6 +31,11 @@
 #include <qub3d/window.hpp>
 #include <qub3d/opengl.hpp>
 
+#include <imgui.h>
+#include <examples/imgui_impl_sdl.h>
+#include <examples/imgui_impl_opengl3.h>
+
+
 using namespace qub3d;
 
 Window::Window(const std::string& title, unsigned int w, unsigned int h): m_isRunning(true)
@@ -47,6 +52,11 @@ Window::Window(const std::string& title, unsigned int w, unsigned int h): m_isRu
 	glEnable(GL_MULTISAMPLE);
 
 	SDL_ShowWindow(m_window);
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGui_ImplSDL2_InitForOpenGL(m_window, m_context);
+	ImGui_ImplOpenGL3_Init();
 }
 
 Window::~Window()
@@ -57,11 +67,17 @@ Window::~Window()
 
 void Window::swapBuffers()
 {
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	SDL_GL_SwapWindow(m_window);
 }
 
 void Window::pollEvents()
 {
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame(m_window);
+	ImGui::NewFrame();
+
 	SDL_Event e;
 	while (SDL_PollEvent(&e) > 0)
 	{
@@ -72,6 +88,8 @@ void Window::pollEvents()
 		{
 			handleEvent(e);
 		}
+
+		ImGui_ImplSDL2_ProcessEvent(&e);
 	}
 }
 

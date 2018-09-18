@@ -20,3 +20,26 @@ set_target_properties (yaml-cpp PROPERTIES FOLDER "qub3d-libdeps/yaml-cpp")
 set_target_properties (parse PROPERTIES FOLDER "qub3d-libdeps/yaml-cpp")
 set_target_properties (read PROPERTIES FOLDER "qub3d-libdeps/yaml-cpp")
 set_target_properties (sandbox PROPERTIES FOLDER "qub3d-libdeps/yaml-cpp")
+
+set(imgui_sources
+	ImGUI/imconfig.h
+	ImGUI/imgui.cpp
+	ImGUI/imgui.h
+	ImGUI/imgui_demo.cpp
+	ImGUI/imgui_draw.cpp
+	ImGUI/imgui_internal.h
+	ImGUI/stb_rect_pack.h
+	ImGUI/stb_textedit.h
+	ImGUI/stb_truetype.h
+
+	ImGUI/examples/imgui_impl_opengl3.cpp
+	ImGUI/examples/imgui_impl_opengl3.h
+	ImGUI/examples/imgui_impl_sdl.h
+	ImGUI/examples/imgui_impl_sdl.cpp
+)
+include_directories(ImGui)
+include_directories(SDL2/include)
+include_directories(glew/include)
+add_library(imgui ${imgui_sources})
+target_link_libraries(imgui glew_s)
+set_target_properties (imgui PROPERTIES FOLDER "qub3d-libdeps")

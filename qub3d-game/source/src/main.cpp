@@ -32,6 +32,8 @@
 #include <qub3d/shader_pipeline.hpp>
 #include <SDL.h>
 
+#include <imgui.h>
+
 int main(int argc, char** argv)
 {
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -76,7 +78,7 @@ int main(int argc, char** argv)
 	while (window.isRunning())
 	{
 		window.pollEvents();
-
+		ImGui::Text("Hello World!");
 		glClearColor(198 / 255.f, 220/255.f, 255/255.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glDrawArrays(GL_TRIANGLES, 0, 3);

@@ -100,7 +100,6 @@ if(WIN32)
     )
 endif()# WIN32
 
-
 # Link the "SandBlox" binary.
 
 add_executable(qub3d-game ${client_sources} ${clientHeaders})
@@ -123,4 +122,4 @@ set_target_properties(qub3d-game PROPERTIES
 )
 
 include_directories(${include_dirs})
-target_link_libraries(qub3d-game ${library_dirs})
+target_link_libraries(qub3d-game ${library_dirs} imgui)
