@@ -35,11 +35,16 @@ using namespace qub3d;
 
 Window::Window(const std::string& title, unsigned int w, unsigned int h): m_isRunning(true)
 {
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+
 	m_window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_OPENGL);
 	m_context = SDL_GL_CreateContext(m_window);
 
 	glewExperimental = GL_TRUE;
 	glewInit();
+
+	glEnable(GL_MULTISAMPLE);
 
 	SDL_ShowWindow(m_window);
 }

@@ -54,13 +54,32 @@ int main(int argc, char** argv)
 	pipeline.addStage(qub3d::ShaderPipelineStage::FRAGMENT, "assets/shaders/basic_fragment.glsl");
 	pipeline.build();
 	
+	float vertices[] = {
+		-0.5f, -0.5f, 0.0f,
+		0.5f, -0.5f, 0.0f,
+		0.0f,  0.5f, 0.0f
+	};
+
+	unsigned int VAO;
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	unsigned int VBO;
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	pipeline.bind();
+
 	while (window.isRunning())
 	{
 		window.pollEvents();
 
-		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(198 / 255.f, 220/255.f, 255/255.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT);
-
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 		window.swapBuffers();
 	}
 
