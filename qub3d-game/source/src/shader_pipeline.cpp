@@ -35,7 +35,7 @@
 
 using namespace qub3d;
 
-GLuint ShaderPipeline::getUniformLocation(const std::string& uniformName)
+GLint ShaderPipeline::getUniformLocation(const std::string& uniformName)
 {
 	auto it = m_uniformLocationMap.find(uniformName);
 	
@@ -46,7 +46,7 @@ GLuint ShaderPipeline::getUniformLocation(const std::string& uniformName)
 	}
 	else
 	{
-		GLuint location = glGetUniformLocation(m_program, uniformName.c_str());
+		GLint location = glGetUniformLocation(m_program, uniformName.c_str());
 		if (location >= 0)
 		{
 			m_uniformLocationMap[uniformName] = location;

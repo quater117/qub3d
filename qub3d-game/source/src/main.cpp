@@ -79,7 +79,7 @@ int main(int argc, char** argv)
 		window.swapBuffers();
 
 		lastTicks = currentTicks;
-		SDL_Delay(1000 / 60.f);
+		SDL_Delay(1000 / 60);
 	}
 
 	SDL_Quit();

@@ -59,13 +59,13 @@ namespace qub3d
 
 		void destroy();
 
-		GLuint getUniformLocation(const std::string& uniformName);
+		GLint getUniformLocation(const std::string& uniformName);
 		void setUniform(const std::string& uniformName, const glm::mat4& matrix);
 
 	private:
 		GLuint m_program;
 
 		std::vector<GLuint> m_shaderIDs;
-		std::unordered_map<std::string, GLuint> m_uniformLocationMap;
+		std::unordered_map<std::string, GLint> m_uniformLocationMap;
 	};
 }
