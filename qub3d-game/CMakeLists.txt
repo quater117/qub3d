@@ -47,6 +47,7 @@ set(client_sources
 	${source_dir}/io.cpp
 	${source_dir}/imgui.cpp
 	${source_dir}/fly_cam.cpp
+	${source_dir}/chunk_renderer.cpp
 )
 
 set(clientHeaders
@@ -56,6 +57,9 @@ set(clientHeaders
 	${headers_dir}/io.hpp
 	${headers_dir}/imgui.hpp
 	${headers_dir}/fly_cam.hpp
+	${headers_dir}/chunk_renderer.hpp
+
+	${headers_dir}/stb_image.h
 )
 
 if(APPLE)

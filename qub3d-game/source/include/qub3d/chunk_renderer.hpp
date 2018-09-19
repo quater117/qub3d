@@ -28,61 +28,31 @@
 *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <qub3d/window.hpp>
-#include <qub3d/shader_pipeline.hpp>
-#include <SDL.h>
+#pragma once
 
-#include <qub3d/imgui.hpp>
-#include <qub3d/fly_cam.hpp>
-#include <qub3d/chunk_renderer.hpp>
+#include <GL/glew.h>
 
-#include <glm/gtc/matrix_transform.hpp>
+#include <array>
 
-int main(int argc, char** argv)
+namespace qub3d
 {
-	SDL_Init(SDL_INIT_EVERYTHING);
-	
-	qub3d::Window window("Qub3d Game", 1280, 720);
-
-	qub3d::ShaderPipeline pipeline;
-	pipeline.addStage(qub3d::ShaderPipelineStage::VERTEX, "assets/shaders/basic_vertex.glsl");
-	pipeline.addStage(qub3d::ShaderPipelineStage::FRAGMENT, "assets/shaders/basic_fragment.glsl");
-	pipeline.build();
-	
-	pipeline.bind();
-
-	qub3d::FlyCamera camera(window);
-	
-	qub3d::Chunk chunk;
-	chunk.fill();
-
-	glm::mat4 projection = glm::perspective(45.f, 1280.f / 720.f, 0.1f, 100.f);
-
-	glEnable(GL_DEPTH_TEST);
-
-	unsigned int lastTicks = SDL_GetTicks();
-	while (window.isRunning())
+	class Chunk
 	{
-		window.pollEvents();
-		
-		unsigned int currentTicks = SDL_GetTicks();
-		float dt = (currentTicks - lastTicks) / 1000.f;	// the "/ 1000" here converts the delta time from milliseconds to seconds.
-		camera.tick(dt);
+	public:
+		static const int SIZE = 4;
+		typedef std::array<std::array<std::array<bool, SIZE>, SIZE>, SIZE> BlockArray;
 
-		pipeline.setUniform("mvp", projection * camera.calculateViewMatrix());
+		Chunk();
 
-		glClearColor(198 / 255.f, 220/255.f, 255/255.f, 1.f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-		chunk.draw();
+		void fill();
 
-		window.swapBuffers();
+		inline GLuint getVAO() const { return m_vao; }
+		inline GLuint getVBO() const { return m_vbo; }
+		inline GLuint getEBO() const { return m_ebo; }
 
-		lastTicks = currentTicks;
-		SDL_Delay(1000 / 60.f);
-	}
-
-	SDL_Quit();
-
-	return 0;
+		void draw();
+	private:
+		GLuint m_vao, m_vbo, m_ebo;
+		BlockArray m_blocks;
+	};
 }
