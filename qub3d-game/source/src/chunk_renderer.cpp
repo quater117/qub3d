@@ -29,7 +29,10 @@
 */
 
 #include <qub3d/chunk_renderer.hpp>
+
 #include <glm/glm.hpp>
+
+#include <cstring>
 
 using namespace qub3d;
 
@@ -39,8 +42,8 @@ Chunk::Chunk()
 const int NUM_VERTICES_IN_CUBE = 8;
 const int NUM_INDICES_IN_CUBE = 6 * 6;
 
-const int CHUNK_NUM_VERTICES = Chunk::SIZE * Chunk::SIZE * NUM_VERTICES_IN_CUBE;
-const int CHUNK_NUM_INDICES = Chunk::SIZE * Chunk::SIZE * NUM_INDICES_IN_CUBE;
+const int CHUNK_NUM_VERTICES = Chunk::SIZE * Chunk::SIZE * Chunk::SIZE * NUM_VERTICES_IN_CUBE;
+const int CHUNK_NUM_INDICES = Chunk::SIZE * Chunk::SIZE * Chunk::SIZE * NUM_INDICES_IN_CUBE;
 
 void Chunk::fill()
 {
@@ -56,7 +59,7 @@ void Chunk::fill()
 		glm::vec3(-1.0,  1.0, -1.0),
 	};
 
-	static const unsigned int CUBE_INDICES[] = {
+	static const unsigned short CUBE_INDICES[] = {
 		0, 1, 2,
 		2, 3, 0,
 		
@@ -77,52 +80,48 @@ void Chunk::fill()
 	};
 
 	glm::vec3 *chunkVertices = new glm::vec3[CHUNK_NUM_VERTICES];
-	unsigned int *chunkIndices = new unsigned int[CHUNK_NUM_INDICES];
+	unsigned short *chunkIndices = new unsigned short[CHUNK_NUM_INDICES];
 	
-	int indexOffset = 0;
+	short indexOffset = 0;
 	
-	// = (x* component size) + (y*component size) * width
-
-	for (int y = 0; y < SIZE; y++)
+	for (int z = 0; z < SIZE; z++)
 	{
-		for (int x = 0; x < SIZE; x++)
+		for (int y = 0; y < SIZE; y++)
 		{
-			int iv = (x * NUM_VERTICES_IN_CUBE) + (y * NUM_VERTICES_IN_CUBE) * SIZE;
-			memcpy(chunkVertices + iv, CUBE_VERTICES, sizeof(CUBE_VERTICES));
-			for (int j = iv; j < iv + NUM_VERTICES_IN_CUBE; j++)
+			for (int x = 0; x < SIZE; x++)
 			{
-				chunkVertices[j].x += x * 3;
-				chunkVertices[j].y += y * 3;
-			}
+				// This might look very scary, but it's really not.
+				// Basically it derives from the algorithm to convert 3D array indices/coordinates into a 1D array
+				// coordinate.
+				//
+				// ALGORITHM:
+				//			x + width * (y + depth * z)
+				//
+				// the (x,y,z) coordinates get multiplied out by the NUM_VERTICES_IN_CUBE because the first block is represented by
+				// the first NUM_VERTICES_IN_CUBE number of vertices, 
+				// the second block is represented by the second NUM_VERTICES_IN_CUBE set of vertices. etc...
 
-			int ii = (x * NUM_INDICES_IN_CUBE) + (y * NUM_INDICES_IN_CUBE) * SIZE;
-			memcpy(chunkIndices + ii, CUBE_INDICES, sizeof(CUBE_INDICES));
-			for (int j = ii; j < ii + NUM_INDICES_IN_CUBE; j++)
-			{
-				chunkIndices[j] += indexOffset;
+				int iv = (x * NUM_VERTICES_IN_CUBE) + SIZE * ((y * NUM_VERTICES_IN_CUBE) + SIZE * (z * NUM_VERTICES_IN_CUBE));
+				std::memcpy(chunkVertices + iv, CUBE_VERTICES, sizeof(CUBE_VERTICES));
+				
+				for (int j = iv; j < iv + NUM_VERTICES_IN_CUBE; j++)
+				{
+					chunkVertices[j].x += x * 3;
+					chunkVertices[j].y += y * 3;
+					chunkVertices[j].z += z * 3;
+				}
+
+				int ii = (x * NUM_INDICES_IN_CUBE) + SIZE * ((y * NUM_INDICES_IN_CUBE) + SIZE * (z * NUM_INDICES_IN_CUBE));
+				std::memcpy(chunkIndices + ii, CUBE_INDICES, sizeof(CUBE_INDICES));
+				
+				for (int j = ii; j < ii + NUM_INDICES_IN_CUBE; j++)
+				{
+					chunkIndices[j] += indexOffset;
+				}
+				indexOffset += 8;
 			}
-			indexOffset += 8;
 		}
 	}
-	
-	/*for (int i = 0; i < SIZE; i++)
-	{
-		memcpy(chunkVertices + (i * NUM_VERTICES_IN_CUBE), CUBE_VERTICES, sizeof(CUBE_VERTICES));
-		int copiedVerticesIndex = i * NUM_VERTICES_IN_CUBE;
-		
-		for (int j = copiedVerticesIndex; j < copiedVerticesIndex + NUM_VERTICES_IN_CUBE; j++)
-		{
-			chunkVertices[j].x += i * 3;
-		}
-
-		memcpy(chunkIndices + (i * NUM_INDICES_IN_CUBE), CUBE_INDICES, sizeof(CUBE_INDICES));
-		int copiedIndicesIndex = i * NUM_INDICES_IN_CUBE;
-
-		for(int j = copiedIndicesIndex; j < copiedIndicesIndex + 6 * 6; j++)
-		{
-			chunkIndices[j] += i * 8;
-		}
-	}*/
 
 	glGenVertexArrays(1, &m_vao);
 	glBindVertexArray(m_vao);
@@ -136,7 +135,7 @@ void Chunk::fill()
 
 	glGenBuffers(1, &m_ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, CHUNK_NUM_INDICES * sizeof(unsigned int), chunkIndices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, CHUNK_NUM_INDICES * sizeof(unsigned short), chunkIndices, GL_STATIC_DRAW);
 	
 	for (int z = 0; z < Chunk::SIZE; ++z)
 	{
@@ -158,5 +157,5 @@ void Chunk::draw()
 	glBindVertexArray(m_vao);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
 
-	glDrawElements(GL_TRIANGLES, CHUNK_NUM_INDICES, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, CHUNK_NUM_INDICES, GL_UNSIGNED_SHORT, 0);
 }
