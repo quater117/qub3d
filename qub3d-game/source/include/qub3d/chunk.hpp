@@ -51,6 +51,10 @@ namespace qub3d
 		inline GLuint getEBO() const { return m_ebo; }
 
 		void draw();
+
+		void placeBlockAt(int x, int y, int z);
+		void destroyBlockAt(int x, int y, int z);
+
 	private:
 		GLuint m_vao, m_vbo, m_ebo;
 		BlockArray m_blocks;

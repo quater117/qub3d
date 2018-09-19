@@ -28,7 +28,7 @@
 *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <qub3d/chunk_renderer.hpp>
+#include <qub3d/chunk.hpp>
 
 #include <glm/glm.hpp>
 
@@ -45,20 +45,20 @@ const int NUM_INDICES_IN_CUBE = 6 * 6;
 const int CHUNK_NUM_VERTICES = Chunk::SIZE * Chunk::SIZE * Chunk::SIZE * NUM_VERTICES_IN_CUBE;
 const int CHUNK_NUM_INDICES = Chunk::SIZE * Chunk::SIZE * Chunk::SIZE * NUM_INDICES_IN_CUBE;
 
+static const glm::vec3 CUBE_VERTICES[] = {
+	glm::vec3(-1.0f, -1.0f,  1.0f),
+	glm::vec3(1.0f, -1.0f,  1.0f),
+	glm::vec3(1.0f,  1.0f,  1.0f),
+	glm::vec3(-1.0f,  1.0f,  1.0f),
+
+	glm::vec3(-1.0f, -1.0f, -1.0f),
+	glm::vec3(1.0f, -1.0f, -1.0f),
+	glm::vec3(1.0f,  1.0f, -1.0f),
+	glm::vec3(-1.0f,  1.0f, -1.0f),
+};
+
 void Chunk::fill()
 {
-	static const glm::vec3 CUBE_VERTICES[] = {
-		glm::vec3(-1.0f, -1.0f,  1.0f),
-		glm::vec3(1.0, -1.0,  1.0),
-		glm::vec3(1.0,  1.0,  1.0),
-		glm::vec3(-1.0,  1.0,  1.0),
-		
-		glm::vec3(-1.0, -1.0, -1.0),
-		glm::vec3(1.0, -1.0, -1.0),
-		glm::vec3(1.0,  1.0, -1.0),
-		glm::vec3(-1.0,  1.0, -1.0),
-	};
-
 	static const unsigned short CUBE_INDICES[] = {
 		0, 1, 2,
 		2, 3, 0,
@@ -150,6 +150,46 @@ void Chunk::fill()
 
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
+}
+
+void Chunk::placeBlockAt(int x, int y, int z)
+{
+	if (x >= SIZE || y >= SIZE || z >= SIZE)
+		return;
+
+	if (x < 0 || y < 0 || z < 0)
+		return;
+
+	int iv = ((x * NUM_VERTICES_IN_CUBE) + SIZE * ((y * NUM_VERTICES_IN_CUBE) + SIZE * (z * NUM_VERTICES_IN_CUBE))) * sizeof(glm::vec3) * sizeof(float);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBufferSubData(GL_ARRAY_BUFFER, iv, sizeof(CUBE_VERTICES), CUBE_VERTICES);
+}
+
+void Chunk::destroyBlockAt(int x, int y, int z)
+{
+	if (x >= SIZE || y >= SIZE || z >= SIZE)
+		return;
+
+	if (x < 0 || y < 0 || z < 0)
+		return;
+
+	static const glm::vec3 EMPTY_BLOCK[] = {
+		glm::vec3(0.f),
+		glm::vec3(0.f),
+		glm::vec3(0.f),
+		glm::vec3(0.f),
+
+		glm::vec3(0.f),
+		glm::vec3(0.f),
+		glm::vec3(0.f),
+		glm::vec3(0.f),
+	};
+
+	int iv = ((x * NUM_VERTICES_IN_CUBE) + SIZE * ((y * NUM_VERTICES_IN_CUBE) + SIZE * (z * NUM_VERTICES_IN_CUBE))) * sizeof(glm::vec3) * sizeof(float);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBufferSubData(GL_ARRAY_BUFFER, iv, sizeof(EMPTY_BLOCK), EMPTY_BLOCK);
 }
 
 void Chunk::draw()

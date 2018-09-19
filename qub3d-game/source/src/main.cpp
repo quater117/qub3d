@@ -34,7 +34,7 @@
 
 #include <qub3d/imgui.hpp>
 #include <qub3d/fly_cam.hpp>
-#include <qub3d/chunk_renderer.hpp>
+#include <qub3d/chunk.hpp>
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -55,6 +55,11 @@ int main(int argc, char** argv)
 	
 	qub3d::Chunk chunk;
 	chunk.fill();
+	
+	for (int x = 1; x < qub3d::Chunk::SIZE - 1; x++) 
+	{
+		chunk.destroyBlockAt(x, 0, 0);
+	}
 
 	glm::mat4 projection = glm::perspective(45.f, 1280.f / 720.f, 0.1f, 100.f);
 
