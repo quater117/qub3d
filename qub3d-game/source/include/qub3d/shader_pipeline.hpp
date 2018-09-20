@@ -60,12 +60,30 @@ namespace qub3d
 		void destroy();
 
 		GLint getUniformLocation(const std::string& uniformName);
-		void setUniform(const std::string& uniformName, const glm::mat4& matrix);
+
+		void setUniform(const std::string& uniformName, glm::mat4& matrix);
+		void setUniform(const std::string& uniformName, float& value);
+
+		void debugGUI();
+
+		template <typename T>
+		T* getUniformValuePtr(const std::string& uniformName)
+		{
+			return (T*)m_uniformValueMap[uniformName];
+		}
+
+	private:
+		template <typename T>
+		void updateUniformValue(const std::string& name, T& value)
+		{
+			m_uniformValueMap[name] = static_cast<void*>(&value);
+		}
 
 	private:
 		GLuint m_program;
 
 		std::vector<GLuint> m_shaderIDs;
 		std::unordered_map<std::string, GLint> m_uniformLocationMap;
+		std::unordered_map<std::string, void*> m_uniformValueMap;
 	};
 }

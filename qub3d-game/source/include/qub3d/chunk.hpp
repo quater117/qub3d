@@ -39,12 +39,9 @@ namespace qub3d
 	class Chunk
 	{
 	public:
-		static const int SIZE = 4;
-		typedef std::array<std::array<std::array<bool, SIZE>, SIZE>, SIZE> BlockArray;
-
 		Chunk();
 
-		void fill();
+		void fill(int size);
 
 		inline GLuint getVAO() const { return m_vao; }
 		inline GLuint getVBO() const { return m_vbo; }
@@ -54,9 +51,17 @@ namespace qub3d
 
 		void placeBlockAt(int x, int y, int z);
 		void destroyBlockAt(int x, int y, int z);
+	
+	private:
+		void destroyOpenGLData();
+		void setChunkSize(int size);
 
 	private:
 		GLuint m_vao, m_vbo, m_ebo;
-		BlockArray m_blocks;
+		
+		bool m_filled;
+
+		int m_totalVerticesInChunk, m_totalIndicesInChunk;
+		int m_chunkSize;
 	};
 }

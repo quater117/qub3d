@@ -10,9 +10,11 @@ float map(float value, float min1, float max1, float min2, float max2)
 	return value;
 }
 
+uniform float colorMapRange;
+
 void main()
 {
-	float fmax = 16.0f;
+	float fmax = colorMapRange;
 
 	vec3 col = pass_position;
 	col.r = map(col.r, -1.0f, fmax, 0.0f, 1.0f);

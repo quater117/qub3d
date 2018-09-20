@@ -31,6 +31,8 @@
 #include <qub3d/shader_pipeline.hpp>
 #include <qub3d/io.hpp>
 
+#include <qub3d/imgui.hpp>
+
 #include <glm/gtc/type_ptr.hpp>
 
 using namespace qub3d;
@@ -60,9 +62,16 @@ GLint ShaderPipeline::getUniformLocation(const std::string& uniformName)
 	}
 }
 
-void ShaderPipeline::setUniform(const std::string& uniformName, const glm::mat4& matrix)
+void ShaderPipeline::setUniform(const std::string& uniformName, glm::mat4& matrix)
 {
 	glUniformMatrix4fv(this->getUniformLocation(uniformName), 1, GL_FALSE, glm::value_ptr(matrix));
+	updateUniformValue(uniformName, matrix);
+}
+
+void ShaderPipeline::setUniform(const std::string& uniformName, float& value)
+{
+	glUniform1f(this->getUniformLocation(uniformName), value);
+	updateUniformValue(uniformName, value);
 }
 
 void ShaderPipeline::addStage(ShaderPipelineStage stage, const std::string& shaderFilepath)
@@ -121,4 +130,41 @@ void ShaderPipeline::bind()
 void ShaderPipeline::unbind()
 {
 	glUseProgram(0);
+}
+
+void ShaderPipeline::debugGUI()
+{
+	ImGui::Begin("Shader pipeline debugging tool");
+	if (ImGui::CollapsingHeader("Uniform Editor")) 
+	{
+		int count;
+		glGetProgramiv(m_program, GL_ACTIVE_UNIFORMS, &count);
+
+		char name[512];
+		GLint length, size;
+		GLenum type;
+		for (int i = 0; i < count; i++)
+		{
+			glGetActiveUniform(m_program, (GLuint)i, 512, &length, &size, &type, name);
+			
+			switch (type)
+			{
+			case GL_FLOAT_MAT4:
+				if (ImGui::InputMatrix4x4(name, getUniformValuePtr<glm::mat4>(name)))
+				{
+					setUniform(name, *getUniformValuePtr<glm::mat4>(name));
+				}
+				break;
+			case GL_FLOAT:
+				if (ImGui::InputFloat(name, getUniformValuePtr<float>(name)))
+				{
+					setUniform(name, *getUniformValuePtr<float>(name));
+				}
+				break;
+			}
+			ImGui::NewLine();
+		}
+	}
+
+	ImGui::End();
 }

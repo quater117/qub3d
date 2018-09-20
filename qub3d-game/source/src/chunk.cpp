@@ -36,16 +36,26 @@
 
 using namespace qub3d;
 
+void Chunk::destroyOpenGLData()
+{
+	glDeleteVertexArrays(1, &m_vao);
+	glDeleteBuffers(1, &m_vbo);
+	glDeleteBuffers(1, &m_ebo);
+
+	m_filled = false;
+}
+
 Chunk::Chunk()
+	: m_vao(-1), m_vbo(-1), m_ebo(-1),
+	m_filled(false),
+	m_totalIndicesInChunk(0), m_totalVerticesInChunk(0),
+	m_chunkSize(0)
 {}
 
 int indexCount = 0;
 
 const int NUM_VERTICES_IN_CUBE = 8;
 const int NUM_INDICES_IN_CUBE = 6 * 6;
-
-const int CHUNK_NUM_VERTICES = Chunk::SIZE * Chunk::SIZE * Chunk::SIZE * NUM_VERTICES_IN_CUBE;
-const int CHUNK_NUM_INDICES = Chunk::SIZE * Chunk::SIZE * Chunk::SIZE * NUM_INDICES_IN_CUBE;
 
 static const glm::vec3 CUBE_VERTICES[] = {
 	glm::vec3(-1.0f, -1.0f,  1.0f),
@@ -59,38 +69,47 @@ static const glm::vec3 CUBE_VERTICES[] = {
 	glm::vec3(-1.0f,  1.0f, -1.0f),
 };
 
-void Chunk::fill()
-{
-	static const unsigned short CUBE_INDICES[] = {
-		0, 1, 2,
-		2, 3, 0,
-		
-		1, 5, 6,
-		6, 2, 1,
-		
-		7, 6, 5,
-		5, 4, 7,
-		
-		4, 0, 3,
-		3, 7, 4,
-		
-		4, 5, 1,
-		1, 0, 4,
-		
-		3, 2, 6,
-		6, 7, 3,
-	};
 
-	glm::vec3 *chunkVertices = new glm::vec3[CHUNK_NUM_VERTICES];
-	unsigned short *chunkIndices = new unsigned short[CHUNK_NUM_INDICES];
+static const unsigned short CUBE_INDICES[] = {
+	0, 1, 2,
+	2, 3, 0,
+	1, 5, 6,
+	6, 2, 1,
+	7, 6, 5,
+	5, 4, 7,
+	4, 0, 3,
+	3, 7, 4,
+	4, 5, 1,
+	1, 0, 4,
+	3, 2, 6,
+	6, 7, 3,
+};
+
+void Chunk::setChunkSize(int size) {
+	int sizeCubed = size * size * size;
+
+	m_chunkSize = size;
+	m_totalVerticesInChunk = sizeCubed * NUM_VERTICES_IN_CUBE;
+	m_totalIndicesInChunk = sizeCubed * NUM_INDICES_IN_CUBE;
+}
+
+void Chunk::fill(int size)
+{
+	this->setChunkSize(size);
+	
+	if (m_filled)
+		this->destroyOpenGLData();
+
+	glm::vec3 *chunkVertices = new glm::vec3[m_totalVerticesInChunk];
+	unsigned short *chunkIndices = new unsigned short[m_totalIndicesInChunk];
 	
 	short indexOffset = 0;
 	
-	for (int z = 0; z < SIZE; z++)
+	for (int z = 0; z < size; z++)
 	{
-		for (int y = 0; y < SIZE; y++)
+		for (int y = 0; y < size; y++)
 		{
-			for (int x = 0; x < SIZE; x++)
+			for (int x = 0; x < size; x++)
 			{
 				// This might look very scary, but it's really not.
 				// Basically it derives from the algorithm to convert 3D array indices/coordinates into a 1D array
@@ -103,23 +122,24 @@ void Chunk::fill()
 				// the first NUM_VERTICES_IN_CUBE number of vertices, 
 				// the second block is represented by the second NUM_VERTICES_IN_CUBE set of vertices. etc...
 
-				int iv = (x * NUM_VERTICES_IN_CUBE) + SIZE * ((y * NUM_VERTICES_IN_CUBE) + SIZE * (z * NUM_VERTICES_IN_CUBE));
+				int iv = (x * NUM_VERTICES_IN_CUBE) + size * ((y * NUM_VERTICES_IN_CUBE) + size * (z * NUM_VERTICES_IN_CUBE));
 				std::memcpy(chunkVertices + iv, CUBE_VERTICES, sizeof(CUBE_VERTICES));
 				
 				for (int j = iv; j < iv + NUM_VERTICES_IN_CUBE; j++)
 				{
-					chunkVertices[j].x += x * 3;
-					chunkVertices[j].y += y * 3;
-					chunkVertices[j].z += z * 3;
+					chunkVertices[j].x += x * 2;
+					chunkVertices[j].y += y * 2;
+					chunkVertices[j].z += z * 2;
 				}
 
-				int ii = (x * NUM_INDICES_IN_CUBE) + SIZE * ((y * NUM_INDICES_IN_CUBE) + SIZE * (z * NUM_INDICES_IN_CUBE));
+				int ii = (x * NUM_INDICES_IN_CUBE) + size * ((y * NUM_INDICES_IN_CUBE) + size * (z * NUM_INDICES_IN_CUBE));
 				std::memcpy(chunkIndices + ii, CUBE_INDICES, sizeof(CUBE_INDICES));
 				
 				for (int j = ii; j < ii + NUM_INDICES_IN_CUBE; j++)
 				{
 					chunkIndices[j] += indexOffset;
 				}
+
 				indexOffset += 8;
 				indexCount += NUM_INDICES_IN_CUBE;
 			}
@@ -131,39 +151,30 @@ void Chunk::fill()
 
 	glGenBuffers(1, &m_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, CHUNK_NUM_VERTICES * sizeof(glm::vec3), chunkVertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_totalVerticesInChunk * sizeof(glm::vec3), chunkVertices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
 	glGenBuffers(1, &m_ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, CHUNK_NUM_INDICES * sizeof(unsigned short), chunkIndices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_totalIndicesInChunk * sizeof(unsigned short), chunkIndices, GL_STATIC_DRAW);
 	
-	for (int z = 0; z < Chunk::SIZE; ++z)
-	{
-		for (int y = 0; y < Chunk::SIZE; ++y)
-		{
-			for (int x = 0; x < Chunk::SIZE; ++x)
-			{
-				m_blocks[z][x][y] = true;
-			}
-		}
-	}
-
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
+
+	m_filled = true;
 }
 
 void Chunk::placeBlockAt(int x, int y, int z)
 {
-	if (x >= SIZE || y >= SIZE || z >= SIZE)
+	if (x >= m_chunkSize || y >= m_chunkSize || z >= m_chunkSize)
 		return;
 
 	if (x < 0 || y < 0 || z < 0)
 		return;
 
-	int iv = ((x * NUM_VERTICES_IN_CUBE) + SIZE * ((y * NUM_VERTICES_IN_CUBE) + SIZE * (z * NUM_VERTICES_IN_CUBE))) * sizeof(glm::vec3) * sizeof(float);
+	int iv = ((x * NUM_VERTICES_IN_CUBE) + m_chunkSize * ((y * NUM_VERTICES_IN_CUBE) + m_chunkSize * (z * NUM_VERTICES_IN_CUBE))) * sizeof(glm::vec3);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, iv, sizeof(CUBE_VERTICES), CUBE_VERTICES);
@@ -171,7 +182,7 @@ void Chunk::placeBlockAt(int x, int y, int z)
 
 void Chunk::destroyBlockAt(int x, int y, int z)
 {
-	if (x >= SIZE || y >= SIZE || z >= SIZE)
+	if (x >= m_chunkSize || y >= m_chunkSize || z >= m_chunkSize)
 		return;
 
 	if (x < 0 || y < 0 || z < 0)
@@ -189,7 +200,7 @@ void Chunk::destroyBlockAt(int x, int y, int z)
 		glm::vec3(0.f),
 	};
 
-	int iv = ((y * NUM_VERTICES_IN_CUBE) + SIZE * ((x * NUM_VERTICES_IN_CUBE) + SIZE * (z * NUM_VERTICES_IN_CUBE))) * sizeof(glm::vec3) * sizeof(float);
+	int iv = ((x * NUM_VERTICES_IN_CUBE) + m_chunkSize * ((y * NUM_VERTICES_IN_CUBE) + m_chunkSize * (z * NUM_VERTICES_IN_CUBE))) * sizeof(glm::vec3);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, iv, sizeof(EMPTY_BLOCK), EMPTY_BLOCK);
