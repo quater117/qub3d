@@ -20,3 +20,5 @@ set_target_properties (yaml-cpp PROPERTIES FOLDER "qub3d-libdeps/yaml-cpp")
 set_target_properties (parse PROPERTIES FOLDER "qub3d-libdeps/yaml-cpp")
 set_target_properties (read PROPERTIES FOLDER "qub3d-libdeps/yaml-cpp")
 set_target_properties (sandbox PROPERTIES FOLDER "qub3d-libdeps/yaml-cpp")
+
+add_subdirectory(wren)
