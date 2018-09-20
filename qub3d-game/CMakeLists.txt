@@ -48,6 +48,7 @@ set(client_sources
 	${source_dir}/imgui.cpp
 	${source_dir}/fly_cam.cpp
 	${source_dir}/chunk.cpp
+	${source_dir}/texture.cpp
 )
 
 set(clientHeaders
@@ -58,7 +59,7 @@ set(clientHeaders
 	${headers_dir}/imgui.hpp
 	${headers_dir}/fly_cam.hpp
 	${headers_dir}/chunk.hpp
-
+	${headers_dir}/texture.hpp
 	${headers_dir}/stb_image.h
 )
 
@@ -112,7 +113,7 @@ endif()# WIN32
 
 add_executable(qub3d-game ${client_sources} ${clientHeaders})
 
-file(GLOB shaders ${CMAKE_CURRENT_SOURCE_DIR}/../assets/shaders/*.glsl)
+file(GLOB shaders ${CMAKE_CURRENT_SOURCE_DIR}/../assets/shaders/*.vert ${CMAKE_CURRENT_SOURCE_DIR}/../assets/shaders/*.frag)
 
 add_custom_target(assets
                    COMMAND ${CMAKE_COMMAND} -E copy_directory

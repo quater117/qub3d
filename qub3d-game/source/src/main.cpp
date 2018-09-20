@@ -35,6 +35,7 @@
 #include <qub3d/imgui.hpp>
 #include <qub3d/fly_cam.hpp>
 #include <qub3d/chunk.hpp>
+#include <qub3d/texture.hpp>
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -45,20 +46,25 @@ int main(int argc, char** argv)
 	qub3d::Window window("Qub3d Game", 1280, 720);
 
 	qub3d::ShaderPipeline pipeline;
-	pipeline.addStage(qub3d::ShaderPipelineStage::VERTEX, "assets/shaders/basic_vertex.glsl");
-	pipeline.addStage(qub3d::ShaderPipelineStage::FRAGMENT, "assets/shaders/basic_fragment.glsl");
+	pipeline.addStage(qub3d::ShaderPipelineStage::VERTEX, "assets/shaders/basic_vertex.vert");
+	pipeline.addStage(qub3d::ShaderPipelineStage::FRAGMENT, "assets/shaders/basic_fragment.frag");
 	pipeline.build();
 	
 	pipeline.bind();
 
 	qub3d::FlyCamera camera(window);
 	
+	qub3d::Texture2D texture;
+	texture.load("assets/textures/dirt.png");
+	texture.bind(0);
+
 	qub3d::Chunk chunk;
 	chunk.fill(4);
 
 	glm::mat4 projection = glm::perspective(45.f, 1280.f / 720.f, 0.1f, 100.f);
 
 	glEnable(GL_DEPTH_TEST);
+	glClearColor(198 / 255.f, 220 / 255.f, 255 / 255.f, 1.f);
 
 	int chunkSize = 4;
 	float colorMapRange = 4.f;
@@ -99,7 +105,6 @@ int main(int argc, char** argv)
 		pipeline.setUniform("mvp", mvp);
 		pipeline.setUniform("colorMapRange", colorMapRange);
 
-		glClearColor(198 / 255.f, 220/255.f, 255/255.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 		chunk.draw();

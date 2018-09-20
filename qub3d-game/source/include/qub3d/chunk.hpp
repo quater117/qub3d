@@ -57,11 +57,11 @@ namespace qub3d
 		void setChunkSize(int size);
 
 	private:
-		GLuint m_vao, m_vbo, m_ebo;
+		GLuint m_vao, m_vbo, m_ebo, m_tbo;
 		
 		bool m_filled;
 
-		int m_totalVerticesInChunk, m_totalIndicesInChunk;
+		int m_totalVerticesInChunk, m_totalIndicesInChunk, m_totalUvsInChunk;
 		int m_chunkSize;
 	};
 }

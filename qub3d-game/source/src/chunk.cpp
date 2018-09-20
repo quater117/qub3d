@@ -49,40 +49,99 @@ Chunk::Chunk()
 	: m_vao(-1), m_vbo(-1), m_ebo(-1),
 	m_filled(false),
 	m_totalIndicesInChunk(0), m_totalVerticesInChunk(0),
-	m_chunkSize(0)
+	m_chunkSize(0),
+	m_totalUvsInChunk(0)
 {}
 
-int indexCount = 0;
-
-const int NUM_VERTICES_IN_CUBE = 8;
-const int NUM_INDICES_IN_CUBE = 6 * 6;
+const int NUM_VERTICES_IN_CUBE = 36;
+const int NUM_UVS_IN_CUBE = 36;
 
 static const glm::vec3 CUBE_VERTICES[] = {
-	glm::vec3(-1.0f, -1.0f,  1.0f),
-	glm::vec3(1.0f, -1.0f,  1.0f),
-	glm::vec3(1.0f,  1.0f,  1.0f),
-	glm::vec3(-1.0f,  1.0f,  1.0f),
+	glm::vec3(-1.f,-1.f,-1.f),
+	glm::vec3(1.f,-1.f,-1.f),
+	glm::vec3(1.f,1.f,-1.f),
+	glm::vec3(1.f,1.f,-1.f),
+	glm::vec3(-1.f,1.f,-1.f),
+	glm::vec3(-1.f,-1.f,-1.f),
 
-	glm::vec3(-1.0f, -1.0f, -1.0f),
-	glm::vec3(1.0f, -1.0f, -1.0f),
-	glm::vec3(1.0f,  1.0f, -1.0f),
-	glm::vec3(-1.0f,  1.0f, -1.0f),
+	glm::vec3(-1.f,-1.f,1.f),
+	glm::vec3(1.f,-1.f,1.f),
+	glm::vec3(1.f, 1.f,1.f),
+	glm::vec3(1.f, 1.f,1.f),
+	glm::vec3(-1.f, 1.f,1.f),
+	glm::vec3(-1.f, -1.f,1.f),
+
+	glm::vec3(-1.f, 1.f,1.f),
+	glm::vec3(-1.f, 1.f,-1.f),
+	glm::vec3(-1.f, -1.f,-1.f),
+	glm::vec3(-1.f, -1.f,-1.f),
+	glm::vec3(-1.f, -1.f,1.f),
+	glm::vec3(-1.f, 1.f,1.f),
+
+	glm::vec3(1.f, 1.f,1.f),
+	glm::vec3(1.f, 1.f,-1.f),
+	glm::vec3(1.f, -1.f,-1.f),
+	glm::vec3(1.f, -1.f,-1.f),
+	glm::vec3(1.f, -1.f,1.f),
+	glm::vec3(1.f, 1.f,1.f),
+
+	glm::vec3(-1.f, -1.f, -1.f),
+	glm::vec3(1.f, -1.f, -1.f),
+	glm::vec3(1.f, -1.f,  1.f),
+	glm::vec3(1.f, -1.f,  1.f),
+	glm::vec3(-1.f, -1.f,  1.f),
+	glm::vec3(-1.f, -1.f, -1.f),
+
+	glm::vec3(-1.f,  1.f, -1.f),
+	glm::vec3(1.f,  1.f, -1.f),
+	glm::vec3(1.f,  1.f,  1.f),
+	glm::vec3(1.f,  1.f,  1.f),
+	glm::vec3(-1.f,  1.f,  1.f),
+	glm::vec3(-1.f,  1.f, -1.f),
 };
 
+static const glm::vec2 CUBE_UV[] = {
+	glm::vec2(0.f, 0.f),
+	glm::vec2(1.f, 0.f),
+	glm::vec2(1.f, 1.f),
+	glm::vec2(1.f, 1.f),
+	glm::vec2(0.f, 1.f),
+	glm::vec2(0.f, 0.f),
 
-static const unsigned short CUBE_INDICES[] = {
-	0, 1, 2,
-	2, 3, 0,
-	1, 5, 6,
-	6, 2, 1,
-	7, 6, 5,
-	5, 4, 7,
-	4, 0, 3,
-	3, 7, 4,
-	4, 5, 1,
-	1, 0, 4,
-	3, 2, 6,
-	6, 7, 3,
+	glm::vec2(0.f, 0.f),
+	glm::vec2(1.f, 0.f),
+	glm::vec2(1.f, 1.f),
+	glm::vec2(1.f, 1.f),
+	glm::vec2(0.f, 1.f),
+	glm::vec2(0.f, 0.f),
+	
+	glm::vec2(1.f, 0.f),
+	glm::vec2(1.f, 1.f),
+	glm::vec2(0.f, 1.f),
+	glm::vec2(0.f, 1.f),
+	glm::vec2(0.f, 0.f),
+	glm::vec2(1.f, 0.f),
+
+	glm::vec2(1.f, 0.f),
+	glm::vec2(1.f, 1.f),
+	glm::vec2(0.f, 1.f),
+	glm::vec2(0.f, 1.f),
+	glm::vec2(0.f, 0.f),
+	glm::vec2(1.f, 0.f),
+
+	glm::vec2(0.f, 1.f),
+	glm::vec2(1.f, 1.f),
+	glm::vec2(1.f, 0.f),
+	glm::vec2(1.f, 0.f),
+	glm::vec2(0.f, 0.f),
+	glm::vec2(0.f, 1.f),
+
+	glm::vec2(0.f, 1.f),
+	glm::vec2(1.f, 1.f),
+	glm::vec2(1.f, 0.f),
+	glm::vec2(1.f, 0.f),
+	glm::vec2(0.f, 0.f),
+	glm::vec2(0.f, 1.f)
 };
 
 void Chunk::setChunkSize(int size) {
@@ -90,7 +149,7 @@ void Chunk::setChunkSize(int size) {
 
 	m_chunkSize = size;
 	m_totalVerticesInChunk = sizeCubed * NUM_VERTICES_IN_CUBE;
-	m_totalIndicesInChunk = sizeCubed * NUM_INDICES_IN_CUBE;
+	m_totalUvsInChunk = NUM_UVS_IN_CUBE * sizeCubed;
 }
 
 void Chunk::fill(int size)
@@ -101,9 +160,7 @@ void Chunk::fill(int size)
 		this->destroyOpenGLData();
 
 	glm::vec3 *chunkVertices = new glm::vec3[m_totalVerticesInChunk];
-	unsigned short *chunkIndices = new unsigned short[m_totalIndicesInChunk];
-	
-	short indexOffset = 0;
+	glm::vec2 *chunkUVs = new glm::vec2[m_totalUvsInChunk];
 	
 	for (int z = 0; z < size; z++)
 	{
@@ -132,16 +189,7 @@ void Chunk::fill(int size)
 					chunkVertices[j].z += z * 2;
 				}
 
-				int ii = (x * NUM_INDICES_IN_CUBE) + size * ((y * NUM_INDICES_IN_CUBE) + size * (z * NUM_INDICES_IN_CUBE));
-				std::memcpy(chunkIndices + ii, CUBE_INDICES, sizeof(CUBE_INDICES));
-				
-				for (int j = ii; j < ii + NUM_INDICES_IN_CUBE; j++)
-				{
-					chunkIndices[j] += indexOffset;
-				}
-
-				indexOffset += 8;
-				indexCount += NUM_INDICES_IN_CUBE;
+				std::memcpy(chunkUVs + iv, CUBE_UV, sizeof(CUBE_UV));
 			}
 		}
 	}
@@ -151,17 +199,18 @@ void Chunk::fill(int size)
 
 	glGenBuffers(1, &m_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, m_totalVerticesInChunk * sizeof(glm::vec3), chunkVertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_totalVerticesInChunk * sizeof(glm::vec3), chunkVertices, GL_DYNAMIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	glGenBuffers(1, &m_ebo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_totalIndicesInChunk * sizeof(unsigned short), chunkIndices, GL_STATIC_DRAW);
-	
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+	glGenBuffers(1, &m_tbo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_tbo);
+	glBufferData(GL_ARRAY_BUFFER, m_totalUvsInChunk * sizeof(glm::vec2), chunkUVs, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (void*)0);
+	glEnableVertexAttribArray(1);
+
 
 	m_filled = true;
 }
@@ -189,15 +238,18 @@ void Chunk::destroyBlockAt(int x, int y, int z)
 		return;
 
 	static const glm::vec3 EMPTY_BLOCK[] = {
-		glm::vec3(0.f),
-		glm::vec3(0.f),
-		glm::vec3(0.f),
-		glm::vec3(0.f),
-
-		glm::vec3(0.f),
-		glm::vec3(0.f),
-		glm::vec3(0.f),
-		glm::vec3(0.f),
+		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
+		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
+		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
+		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
+		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
+		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
+		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
+		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
+		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
+		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
+		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
+		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f)
 	};
 
 	int iv = ((x * NUM_VERTICES_IN_CUBE) + m_chunkSize * ((y * NUM_VERTICES_IN_CUBE) + m_chunkSize * (z * NUM_VERTICES_IN_CUBE))) * sizeof(glm::vec3);
@@ -209,7 +261,6 @@ void Chunk::destroyBlockAt(int x, int y, int z)
 void Chunk::draw()
 {
 	glBindVertexArray(m_vao);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-
-	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, 0);
+	
+	glDrawArrays(GL_TRIANGLES, 0, m_totalVerticesInChunk);
 }

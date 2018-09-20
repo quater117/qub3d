@@ -30,14 +30,26 @@
 
 #pragma once
 
+#include <GL/glew.h>
+
 #include <string>
-#include <vector>
 
 namespace qub3d
 {
-	class File
+	class Texture2D
 	{
 	public:
-		static std::string readAllText(const std::string& filepath);
+		Texture2D();
+
+		void load(const std::string& textureFilepath);
+		
+		inline GLuint getTextureID() const { return m_id; }
+
+		void bind(int textureSlot);
+		void unbind();
+
+	private:
+		GLuint m_id;
+		int m_width, m_height;
 	};
 }

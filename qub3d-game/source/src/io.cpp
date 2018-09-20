@@ -1,5 +1,5 @@
-/*
-*	 Copyright (C) 2018 Qub�d Engine Group.
+﻿/*
+*	 Copyright (C) 2018 Qub³d Engine Group.
 *	 All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without modification,
@@ -47,3 +47,7 @@ std::string File::readAllText(const std::string& filepath)
 
 	return text;
 }
+
+// It needs to be done somewhere ¯\_(ツ)_/¯
+#define STB_IMAGE_IMPLEMENTATION
+#include <qub3d/stb_image.h>
