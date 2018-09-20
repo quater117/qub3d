@@ -39,6 +39,8 @@ using namespace qub3d;
 Chunk::Chunk()
 {}
 
+int indexCount = 0;
+
 const int NUM_VERTICES_IN_CUBE = 8;
 const int NUM_INDICES_IN_CUBE = 6 * 6;
 
@@ -119,6 +121,7 @@ void Chunk::fill()
 					chunkIndices[j] += indexOffset;
 				}
 				indexOffset += 8;
+				indexCount += NUM_INDICES_IN_CUBE;
 			}
 		}
 	}
@@ -186,7 +189,7 @@ void Chunk::destroyBlockAt(int x, int y, int z)
 		glm::vec3(0.f),
 	};
 
-	int iv = ((x * NUM_VERTICES_IN_CUBE) + SIZE * ((y * NUM_VERTICES_IN_CUBE) + SIZE * (z * NUM_VERTICES_IN_CUBE))) * sizeof(glm::vec3) * sizeof(float);
+	int iv = ((y * NUM_VERTICES_IN_CUBE) + SIZE * ((x * NUM_VERTICES_IN_CUBE) + SIZE * (z * NUM_VERTICES_IN_CUBE))) * sizeof(glm::vec3) * sizeof(float);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, iv, sizeof(EMPTY_BLOCK), EMPTY_BLOCK);
@@ -197,5 +200,5 @@ void Chunk::draw()
 	glBindVertexArray(m_vao);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
 
-	glDrawElements(GL_TRIANGLES, CHUNK_NUM_INDICES, GL_UNSIGNED_SHORT, 0);
+	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, 0);
 }
