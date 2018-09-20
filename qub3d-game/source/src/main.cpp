@@ -66,6 +66,8 @@ int main(int argc, char** argv)
 	int editPos[3];
 	std::memset(editPos, 0, sizeof(editPos));
 
+	bool wireframe = false;
+
 	unsigned int lastTicks = SDL_GetTicks();
 	while (window.isRunning())
 	{
@@ -75,6 +77,10 @@ int main(int argc, char** argv)
 		if (ImGui::InputInt("Chunk Size", &chunkSize))
 			chunk.fill(chunkSize);
 		
+		if (ImGui::Checkbox("Toggle Wireframe", &wireframe)) {
+			glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
+		}
+
 		if (ImGui::InputInt3("Destroy block at", editPos))
 			chunk.destroyBlockAt(editPos[0], editPos[1], editPos[2]);
 		if (ImGui::InputInt3("Place block at", editPos))
