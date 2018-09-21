@@ -38,21 +38,88 @@
 
 namespace qub3d
 {
+	/**
+	 * @typedef std::function<void(SDL_Event& e)> EventHandler
+	 *
+	 * @brief Abstraction for functions that handle SDL_Event's
+	 *
+	 * Used in `Window` to represent functions that are called by `pollEvents` when
+	 * SDL is polling the events queue, and then processing the current event.
+	 */
 	typedef std::function<void(SDL_Event& e)> EventHandler;
 
+	/**
+	 * Thin abstraction layer over SDL_Window* -> provides a modern C++ interface to handle events and
+	 * handle any boilerplate window/OpenGL context code.
+	 */
 	class Window
 	{
 	public:
+		/**
+		 * @brief Creates and shows the window along with a valid current OpenGL context (with GLEW initalized).
+		 *
+		 * Creates a OpenGL window with the specified parameters in the centre of the window, along with a GLEW initalized
+		 * OpenGL context (which is current). Also will initalize ImGui.
+		 *
+		 * @param[in] title The title of the window
+		 * @param[in] w		The width of the window (in screen coordinates)
+		 * @param[in] h		The height of the window (in screen coordinates)
+		 */
 		Window(const std::string& title, unsigned int w, unsigned int h);
+
+		/**
+		 * @brief Free's any resources that have been allocated by this object.
+		 *
+		 * Destroy the SDL_Window* and the OpenGL context belonging to this window. Invalidates any results of `getSDLWindow`.
+		 */
 		~Window();
 
+		/**
+		 * @brief Returns the SDL_Window pointer for this current window.
+		 *
+		 * Exposes the internal SDL_Window pointer for use when interacting directly with OpenGL.
+		 * This pointer is valid for the lifetime of the Window instance, and is
+		 * not guaranteed to be valid after the destructor of this class (Window) has been called.
+		 * 
+		 * Do not call SDL_DestroyWindow on the returned pointer (or attempt to delete/free it) as this is handled
+		 * internally.
+		 *
+		 * @returns The pointer to the SDL_Window struct.
+		 */
 		inline SDL_Window *getSDLWindow() const { return m_window; }
 
+		/**
+		 * @brief Finalises a frame and swaps the OpenGL buffers.
+		 *
+		 * Will render the current ImGUI state to the screen (preserving any prior OpenGL state),
+		 * and then swaps the OpenGL buffers for this window (if double buffering is enabled, which it is by default).
+		 * Should be called at the end of the game loop (or wherever rendering is finished for that frame).
+  		 */
 		void swapBuffers();
+
+		/**
+		 * @brief Polls the SDL event queue at the start of a frame.
+		 *
+		 * Poll's the SDL event queue and will execute any event handlers that have been added
+		 * via `addEventHandler`. 
+		 * Must be called at the start of the game loop.
+		 */
 		void pollEvents();
 
+		/**
+		 * @brief Subsribes custom event handlers.
+		 *
+		 * Subsribes an event handler that will be called during `pollEvents`
+		 */
 		void addEventHandler(EventHandler eventHandler);
 
+		/**
+		 * @brief Use this function to tell if the window is currently open.
+		 *
+		 * Will return true whilst the window is open/running, and false when it terminates.
+		 *
+		 * @returns Whether this window instance is currently running/open.
+		 */
 		inline bool isRunning() const { return m_isRunning; }
 
 	private:
