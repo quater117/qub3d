@@ -109,16 +109,17 @@ namespace qub3d
 		/**
 		 * @brief Subsribes custom event handlers.
 		 *
-		 * Subsribes an event handler that will be called during `pollEvents`
+		 * Subsribes an event handler that will be called whilst SDL is polling
+		 * for any pending events. Will process all pending events.
+		 *
+		 * @param[in] eventHandler Function object that is called to handle SDL_Events during `pollEvents`
 		 */
 		void addEventHandler(EventHandler eventHandler);
 
 		/**
-		 * @brief Use this function to tell if the window is currently open.
+		 * @brief Use this function to tell if the window is currently running.
 		 *
-		 * Will return true whilst the window is open/running, and false when it terminates.
-		 *
-		 * @returns Whether this window instance is currently running/open.
+		 * @returns true when the window is running, false when the user decides to terminate the window.
 		 */
 		inline bool isRunning() const { return m_isRunning; }
 
