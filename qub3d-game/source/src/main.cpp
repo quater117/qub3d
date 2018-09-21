@@ -59,6 +59,8 @@ int main(int argc, char** argv)
 	texture.bind(0);
 
 	qub3d::Chunk chunk;
+	chunk.initMeshingData();
+	chunk.initVoxelData(glm::vec3(4, 4, 4));
 	chunk.fill(4);
 
 	glm::mat4 projection = glm::perspective(45.f, 1280.f / 720.f, 0.1f, 100.f);

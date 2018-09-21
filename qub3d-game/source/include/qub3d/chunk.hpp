@@ -32,36 +32,53 @@
 
 #include <GL/glew.h>
 
+#include <glm/glm.hpp>
+
 #include <array>
+#include <vector>
 
 namespace qub3d
 {
-	class Chunk
-	{
-	public:
-		Chunk();
+struct Voxel
+{
+	bool active;
+};
 
-		void fill(int size);
+class Chunk
+{
+public:
+	Chunk();
+	~Chunk();
 
-		inline GLuint getVAO() const { return m_vao; }
-		inline GLuint getVBO() const { return m_vbo; }
-		inline GLuint getEBO() const { return m_ebo; }
+	void initVoxelData(glm::vec3& size);
+	void initMeshingData();
 
-		void draw();
+	std::vector<glm::vec4> findCubesToRender();
 
-		void placeBlockAt(int x, int y, int z);
-		void destroyBlockAt(int x, int y, int z);
-	
-	private:
-		void destroyOpenGLData();
-		void setChunkSize(int size);
+	void fill(int size);
 
-	private:
-		GLuint m_vao, m_vbo, m_ebo, m_tbo;
-		
-		bool m_filled;
+	inline GLuint getVAO() const { return m_vao; }
+	inline GLuint getVBO() const { return m_vbo; }
+	inline GLuint getEBO() const { return m_ebo; }
 
-		int m_totalVerticesInChunk, m_totalIndicesInChunk, m_totalUvsInChunk;
-		int m_chunkSize;
-	};
+	void draw();
+
+	void placeBlockAt(int x, int y, int z);
+	void destroyBlockAt(int x, int y, int z);
+
+private:
+	void destroyOpenGLData();
+	void setChunkSize(int size);
+
+private:
+	GLuint m_vao, m_vbo, m_ebo, m_tbo;
+
+	bool m_filled;
+
+	int m_totalVerticesInChunk, m_totalIndicesInChunk, m_totalUvsInChunk;
+	int m_chunkSize;
+
+	glm::vec3 m_voxelDataSize;
+	Voxel* m_voxels;
+};
 }

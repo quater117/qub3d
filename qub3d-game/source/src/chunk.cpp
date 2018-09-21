@@ -30,9 +30,9 @@
 
 #include <qub3d/chunk.hpp>
 
-#include <glm/glm.hpp>
-
+#include <iostream>
 #include <cstring>
+#include <map>
 
 using namespace qub3d;
 
@@ -50,13 +50,134 @@ Chunk::Chunk()
 	m_filled(false),
 	m_totalIndicesInChunk(0), m_totalVerticesInChunk(0),
 	m_chunkSize(0),
-	m_totalUvsInChunk(0)
+	m_totalUvsInChunk(0),
+	m_voxelDataSize(glm::vec3(0,0,0)),
+	m_voxels(nullptr)
 {}
+
+Chunk::~Chunk()
+{
+
+}
 
 const int NUM_VERTICES_IN_CUBE = 36;
 const int NUM_UVS_IN_CUBE = 36;
 
+const int VERTS_PER_FACE = 6;
+const int UVS_PER_FACE = 6;
+
+static std::vector<int> meshID;
+
+static std::vector<std::vector<const glm::vec3*>> meshList;
+static std::vector<std::vector<const glm::vec2*>> meshUVList;
+
+int t = 32;
+int b = 16;
+int l = 8;
+int r = 4;
+int f = 2;
+int k = 1;
+
+static const glm::vec3 FRONT[] = {
+	glm::vec3(-1.f,-1.f,1.f),
+	glm::vec3(1.f,-1.f,1.f),
+	glm::vec3(1.f, 1.f,1.f),
+	glm::vec3(1.f, 1.f,1.f),
+	glm::vec3(-1.f, 1.f,1.f),
+	glm::vec3(-1.f, -1.f,1.f)
+};
+static const glm::vec3 BACK[] = {
+	glm::vec3(-1.f,-1.f,-1.f),
+	glm::vec3(1.f,-1.f,-1.f),
+	glm::vec3(1.f,1.f,-1.f),
+	glm::vec3(1.f,1.f,-1.f),
+	glm::vec3(-1.f,1.f,-1.f),
+	glm::vec3(-1.f,-1.f,-1.f)
+};
+static const glm::vec3 LEFT[] = {
+	glm::vec3(-1.f, 1.f,1.f),
+	glm::vec3(-1.f, 1.f,-1.f),
+	glm::vec3(-1.f, -1.f,-1.f),
+	glm::vec3(-1.f, -1.f,-1.f),
+	glm::vec3(-1.f, -1.f,1.f),
+	glm::vec3(-1.f, 1.f,1.f)
+};
+static const glm::vec3 RIGHT[] = {
+	glm::vec3(1.f, 1.f,1.f),
+	glm::vec3(1.f, 1.f,-1.f),
+	glm::vec3(1.f, -1.f,-1.f),
+	glm::vec3(1.f, -1.f,-1.f),
+	glm::vec3(1.f, -1.f,1.f),
+	glm::vec3(1.f, 1.f,1.f)
+};
+static const glm::vec3 TOP[] = {
+	glm::vec3(-1.f,  1.f, -1.f),
+	glm::vec3(1.f,  1.f, -1.f),
+	glm::vec3(1.f,  1.f,  1.f),
+	glm::vec3(1.f,  1.f,  1.f),
+	glm::vec3(-1.f,  1.f,  1.f),
+	glm::vec3(-1.f,  1.f, -1.f)
+};
+static const glm::vec3 BOTTOM[] = {
+	glm::vec3(-1.f, -1.f, -1.f),
+	glm::vec3(1.f, -1.f, -1.f),
+	glm::vec3(1.f, -1.f,  1.f),
+	glm::vec3(1.f, -1.f,  1.f),
+	glm::vec3(-1.f, -1.f,  1.f),
+	glm::vec3(-1.f, -1.f, -1.f)
+};
+
+static const glm::vec2 FRONT_UV[] = {
+	glm::vec2(0.f, 0.f),
+	glm::vec2(1.f, 0.f),
+	glm::vec2(1.f, 1.f),
+	glm::vec2(1.f, 1.f),
+	glm::vec2(0.f, 1.f),
+	glm::vec2(0.f, 0.f),
+};
+static const glm::vec2 BACK_UV[] = {
+	glm::vec2(0.f, 0.f),
+	glm::vec2(1.f, 0.f),
+	glm::vec2(1.f, 1.f),
+	glm::vec2(1.f, 1.f),
+	glm::vec2(0.f, 1.f),
+	glm::vec2(0.f, 0.f)
+};
+static const glm::vec2 LEFT_UV[] = {
+	glm::vec2(1.f, 0.f),
+	glm::vec2(1.f, 1.f),
+	glm::vec2(0.f, 1.f),
+	glm::vec2(0.f, 1.f),
+	glm::vec2(0.f, 0.f),
+	glm::vec2(1.f, 0.f)
+};
+static const glm::vec2 RIGHT_UV[] = {
+	glm::vec2(1.f, 0.f),
+	glm::vec2(1.f, 1.f),
+	glm::vec2(0.f, 1.f),
+	glm::vec2(0.f, 1.f),
+	glm::vec2(0.f, 0.f),
+	glm::vec2(1.f, 0.f)
+};
+static const glm::vec2 TOP_UV[] = {
+	glm::vec2(0.f, 1.f),
+	glm::vec2(1.f, 1.f),
+	glm::vec2(1.f, 0.f),
+	glm::vec2(1.f, 0.f),
+	glm::vec2(0.f, 0.f),
+	glm::vec2(0.f, 1.f)
+};
+static const glm::vec2 BOTTOM_UV[] = {
+	glm::vec2(0.f, 1.f),
+	glm::vec2(1.f, 1.f),
+	glm::vec2(1.f, 0.f),
+	glm::vec2(1.f, 0.f),
+	glm::vec2(0.f, 0.f),
+	glm::vec2(0.f, 1.f)
+};
+
 static const glm::vec3 CUBE_VERTICES[] = {
+	//back
 	glm::vec3(-1.f,-1.f,-1.f),
 	glm::vec3(1.f,-1.f,-1.f),
 	glm::vec3(1.f,1.f,-1.f),
@@ -64,6 +185,7 @@ static const glm::vec3 CUBE_VERTICES[] = {
 	glm::vec3(-1.f,1.f,-1.f),
 	glm::vec3(-1.f,-1.f,-1.f),
 
+	//front
 	glm::vec3(-1.f,-1.f,1.f),
 	glm::vec3(1.f,-1.f,1.f),
 	glm::vec3(1.f, 1.f,1.f),
@@ -71,6 +193,7 @@ static const glm::vec3 CUBE_VERTICES[] = {
 	glm::vec3(-1.f, 1.f,1.f),
 	glm::vec3(-1.f, -1.f,1.f),
 
+	//left
 	glm::vec3(-1.f, 1.f,1.f),
 	glm::vec3(-1.f, 1.f,-1.f),
 	glm::vec3(-1.f, -1.f,-1.f),
@@ -78,6 +201,7 @@ static const glm::vec3 CUBE_VERTICES[] = {
 	glm::vec3(-1.f, -1.f,1.f),
 	glm::vec3(-1.f, 1.f,1.f),
 
+	//right
 	glm::vec3(1.f, 1.f,1.f),
 	glm::vec3(1.f, 1.f,-1.f),
 	glm::vec3(1.f, -1.f,-1.f),
@@ -85,6 +209,7 @@ static const glm::vec3 CUBE_VERTICES[] = {
 	glm::vec3(1.f, -1.f,1.f),
 	glm::vec3(1.f, 1.f,1.f),
 
+	//bottom
 	glm::vec3(-1.f, -1.f, -1.f),
 	glm::vec3(1.f, -1.f, -1.f),
 	glm::vec3(1.f, -1.f,  1.f),
@@ -92,6 +217,7 @@ static const glm::vec3 CUBE_VERTICES[] = {
 	glm::vec3(-1.f, -1.f,  1.f),
 	glm::vec3(-1.f, -1.f, -1.f),
 
+	//top
 	glm::vec3(-1.f,  1.f, -1.f),
 	glm::vec3(1.f,  1.f, -1.f),
 	glm::vec3(1.f,  1.f,  1.f),
@@ -99,8 +225,8 @@ static const glm::vec3 CUBE_VERTICES[] = {
 	glm::vec3(-1.f,  1.f,  1.f),
 	glm::vec3(-1.f,  1.f, -1.f),
 };
-
 static const glm::vec2 CUBE_UV[] = {
+	//back
 	glm::vec2(0.f, 0.f),
 	glm::vec2(1.f, 0.f),
 	glm::vec2(1.f, 1.f),
@@ -108,6 +234,7 @@ static const glm::vec2 CUBE_UV[] = {
 	glm::vec2(0.f, 1.f),
 	glm::vec2(0.f, 0.f),
 
+	//front
 	glm::vec2(0.f, 0.f),
 	glm::vec2(1.f, 0.f),
 	glm::vec2(1.f, 1.f),
@@ -115,6 +242,7 @@ static const glm::vec2 CUBE_UV[] = {
 	glm::vec2(0.f, 1.f),
 	glm::vec2(0.f, 0.f),
 	
+	//left
 	glm::vec2(1.f, 0.f),
 	glm::vec2(1.f, 1.f),
 	glm::vec2(0.f, 1.f),
@@ -122,6 +250,7 @@ static const glm::vec2 CUBE_UV[] = {
 	glm::vec2(0.f, 0.f),
 	glm::vec2(1.f, 0.f),
 
+	//right
 	glm::vec2(1.f, 0.f),
 	glm::vec2(1.f, 1.f),
 	glm::vec2(0.f, 1.f),
@@ -129,6 +258,7 @@ static const glm::vec2 CUBE_UV[] = {
 	glm::vec2(0.f, 0.f),
 	glm::vec2(1.f, 0.f),
 
+	//bottom
 	glm::vec2(0.f, 1.f),
 	glm::vec2(1.f, 1.f),
 	glm::vec2(1.f, 0.f),
@@ -136,6 +266,7 @@ static const glm::vec2 CUBE_UV[] = {
 	glm::vec2(0.f, 0.f),
 	glm::vec2(0.f, 1.f),
 
+	//top
 	glm::vec2(0.f, 1.f),
 	glm::vec2(1.f, 1.f),
 	glm::vec2(1.f, 0.f),
@@ -152,6 +283,188 @@ void Chunk::setChunkSize(int size) {
 	m_totalUvsInChunk = NUM_UVS_IN_CUBE * sizeCubed;
 }
 
+void Chunk::initVoxelData(glm::vec3& size)
+{
+	// Init
+	m_voxelDataSize = size;
+	m_voxels = new Voxel[size.x*size.y*size.z];
+	
+}
+
+void Chunk::initMeshingData()
+{
+	// Loop through all 64 states of a meshed cube
+	for (int top = 0; top <= 1; top++)
+	{
+		for (int bottom = 0; bottom <= 1; bottom++)
+		{
+			for (int left = 0; left <= 1; left++)
+			{
+				for (int right = 0; right <= 1; right++)
+				{
+					for (int front = 0; front <= 1; front++)
+					{
+						for (int back = 0; back <= 1; back++)
+						{
+							int faceCount = top + bottom + left + right + front + back;
+							meshID.push_back(faceCount);
+							std::vector<const glm::vec3*> mesh;
+							std::vector<const glm::vec2*> meshUV;
+							if (top == 1) {
+								mesh.push_back(TOP);
+								meshUV.push_back(TOP_UV);
+							}
+							if (bottom == 1) {
+								mesh.push_back(BOTTOM);
+								meshUV.push_back(BOTTOM_UV);
+							}
+							if (left == 1) {
+								mesh.push_back(LEFT);
+								meshUV.push_back(LEFT_UV);
+							}
+							if (right == 1) {
+								mesh.push_back(RIGHT);
+								meshUV.push_back(RIGHT_UV);
+							}
+							if (front == 1) {
+								meshUV.push_back(FRONT_UV);
+								mesh.push_back(FRONT);
+							}
+							if (back == 1) {
+								mesh.push_back(BACK);
+								meshUV.push_back(BACK_UV);
+							}
+							meshList.push_back(mesh);
+							meshUVList.push_back(meshUV);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+std::vector<glm::vec4> Chunk::findCubesToRender()
+{
+	//int t = 32;
+	//int b = 16;
+	//int l = 8;
+	//int r = 4;
+	//int f = 2;
+	//int k = 1;
+
+	std::vector<glm::vec4> voxels;
+
+	int z_max, y_max, x_max;
+
+	z_max = m_voxelDataSize.z;
+	y_max = m_voxelDataSize.y;
+	x_max = m_voxelDataSize.x;
+
+	for (int z = 0; z <= z_max; z++)
+	{
+		for (int y = 0; y <= y_max; y++)
+		{
+			for (int x = 0; x <= x_max; x++)
+			{
+				int cubeMeshID = 0;
+
+				bool top, bottom, left, right, back, front;
+
+				if (m_voxels[x+(y*x_max)+(z*x_max*y_max)].active)
+				{
+					//top y+1
+					if (y == y_max)
+					{
+						// top block is not active
+						top = false;
+					}
+					else {
+						top = m_voxels[x + ((y+1)*x_max) + (z*x_max*y_max)].active;
+					}
+					//bottom y-1
+					if (y == 0)
+					{
+						bottom = false;
+					}
+					else
+					{
+						bottom = m_voxels[x + ((y-1)*x_max) + (z*x_max*y_max)].active;
+					}
+					//left x-1
+					if (x == 0)
+					{
+						left = false;
+					}
+					else
+					{
+						left = m_voxels[(x-1) + (y*x_max) + (z*x_max*y_max)].active;
+					}
+					//right x+1
+					if (x == x_max)
+					{
+						// right block is not active
+						right = false;
+					}
+					else {
+						right = m_voxels[(x+1) + (y*x_max) + (z*x_max*y_max)].active;
+					}
+					//front z+1
+					if (z == z_max)
+					{
+						// front block is not active
+						front = false;
+					}
+					else {
+						front = m_voxels[x + (y*x_max) + ((z+1)*x_max*y_max)].active;
+					}
+					//back z-1
+					if (z == 0)
+					{
+						back = false;
+					}
+					else
+					{
+						back = m_voxels[x + (y*x_max) + ((z - 1)*x_max*y_max)].active;
+					}
+					
+					if (!top)
+					{
+						cubeMeshID += t;
+					}
+					if (!bottom)
+					{
+						cubeMeshID += b;
+					}
+					if (!left)
+					{
+						cubeMeshID += l;
+					}
+					if (!right)
+					{
+						cubeMeshID += r;
+					}
+					if (!front)
+					{
+						cubeMeshID += f;
+					}
+					if (!back)
+					{
+						cubeMeshID += k;
+					}
+					
+					// if the mesh is completely blocked in, don't add it
+					if (cubeMeshID != 63)
+					{
+						voxels.push_back(glm::vec4(x, y, z, cubeMeshID));
+					}
+				}
+			}
+		}
+	}
+	return voxels;
+}
+
 void Chunk::fill(int size)
 {
 	this->setChunkSize(size);
@@ -159,15 +472,48 @@ void Chunk::fill(int size)
 	if (m_filled)
 		this->destroyOpenGLData();
 
-	glm::vec3 *chunkVertices = new glm::vec3[m_totalVerticesInChunk];
-	glm::vec2 *chunkUVs = new glm::vec2[m_totalUvsInChunk];
-	
-	for (int z = 0; z < size; z++)
+	m_totalVerticesInChunk = 0;
+	m_totalUvsInChunk = 0;
+
+	std::vector<glm::vec4> voxels = this->findCubesToRender();
+	for (glm::vec4 voxel : voxels)
 	{
-		for (int y = 0; y < size; y++)
+		// add the faces of each voxel to the vert and UV counts
+		m_totalVerticesInChunk += VERTS_PER_FACE * meshID[voxel.w];
+		m_totalVerticesInChunk += UVS_PER_FACE * meshID[voxel.w];
+	}
+
+	glm::vec3* chunkVertices = new glm::vec3[m_totalVerticesInChunk];
+	glm::vec2* chunkUVs = new glm::vec2[m_totalUvsInChunk];
+	
+	int insertVertPos = 0;
+	int insertUVPos = 0;
+
+	for (glm::vec4 voxel : voxels)
+	{
+		int cubeVerts = VERTS_PER_FACE * meshID[voxel.w];
+		insertVertPos += cubeVerts;
+		std::memcpy(chunkVertices + insertVertPos, &meshList[voxel.w], sizeof(meshList[voxel.w]));
+
+		for (int j = insertVertPos; j < insertVertPos + cubeVerts; j++)
 		{
-			for (int x = 0; x < size; x++)
-			{
+			chunkVertices[j].x += voxel.x * 2;
+			chunkVertices[j].y += voxel.y * 2;
+			chunkVertices[j].z += voxel.z * 2;
+		}
+
+		insertUVPos += UVS_PER_FACE * meshID[voxel.w];
+		std::memcpy(chunkUVs + insertUVPos, &meshUVList[voxel.w], sizeof(meshUVList[voxel.w]));
+	}
+
+
+	//for (int z = 0; z < size; z++)
+	//{
+	//	for (int y = 0; y < size; y++)
+	//	{
+	//		for (int x = 0; x < size; x++)
+	//		{
+	//
 				// This might look very scary, but it's really not.
 				// Basically it derives from the algorithm to convert 3D array indices/coordinates into a 1D array
 				// coordinate.
@@ -179,20 +525,20 @@ void Chunk::fill(int size)
 				// the first NUM_VERTICES_IN_CUBE number of vertices, 
 				// the second block is represented by the second NUM_VERTICES_IN_CUBE set of vertices. etc...
 
-				int iv = (x * NUM_VERTICES_IN_CUBE) + size * ((y * NUM_VERTICES_IN_CUBE) + size * (z * NUM_VERTICES_IN_CUBE));
-				std::memcpy(chunkVertices + iv, CUBE_VERTICES, sizeof(CUBE_VERTICES));
-				
-				for (int j = iv; j < iv + NUM_VERTICES_IN_CUBE; j++)
-				{
-					chunkVertices[j].x += x * 2;
-					chunkVertices[j].y += y * 2;
-					chunkVertices[j].z += z * 2;
-				}
+	//			int iv = (x * NUM_VERTICES_IN_CUBE) + size * ((y * NUM_VERTICES_IN_CUBE) + size * (z * NUM_VERTICES_IN_CUBE));
+	//			std::memcpy(chunkVertices + iv, CUBE_VERTICES, sizeof(CUBE_VERTICES));
+	//			
+	//			for (int j = iv; j < iv + NUM_VERTICES_IN_CUBE; j++)
+	//			{
+	//				chunkVertices[j].x += x * 2;
+	//				chunkVertices[j].y += y * 2;
+	//				chunkVertices[j].z += z * 2;
+	//			}
 
-				std::memcpy(chunkUVs + iv, CUBE_UV, sizeof(CUBE_UV));
-			}
-		}
-	}
+	//			std::memcpy(chunkUVs + iv, CUBE_UV, sizeof(CUBE_UV));
+	//		}
+	//	}
+	//}
 
 	glGenVertexArrays(1, &m_vao);
 	glBindVertexArray(m_vao);
