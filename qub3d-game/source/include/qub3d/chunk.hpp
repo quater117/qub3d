@@ -31,14 +31,26 @@
 #pragma once
 
 #include <GL/glew.h>
-
-#include <array>
+#include <glm/vec3.hpp>
+#include <vector>
 
 namespace qub3d
 {
+	enum class BlockFace
+	{
+		FRONT = 0,
+		BACK = 1,
+		LEFT = 2,
+		RIGHT = 3,
+		BOTTOM = 4,
+		TOP = 5
+	};
+
 	class Chunk
 	{
 	public:
+		typedef std::vector<std::vector<std::vector<bool>>> CPUBlockArray;
+
 		Chunk();
 
 		void fill(int size);
@@ -56,6 +68,9 @@ namespace qub3d
 		void destroyOpenGLData();
 		void setChunkSize(int size);
 
+		void addBlockFaceToCPUBuffer(glm::vec3* vertices, int x, int y, int z, BlockFace face);
+		void addBlockFaceToGLBuffer(int x, int y, int z, BlockFace face);
+
 	private:
 		GLuint m_vao, m_vbo, m_ebo, m_tbo;
 		
@@ -63,5 +78,7 @@ namespace qub3d
 
 		int m_totalVerticesInChunk, m_totalIndicesInChunk, m_totalUvsInChunk;
 		int m_chunkSize;
+
+		CPUBlockArray m_blocks;
 	};
 }

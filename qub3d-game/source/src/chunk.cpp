@@ -57,6 +57,7 @@ const int NUM_VERTICES_IN_CUBE = 36;
 const int NUM_UVS_IN_CUBE = 36;
 
 static const glm::vec3 CUBE_VERTICES[] = {
+	// front
 	glm::vec3(-1.f,-1.f,-1.f),
 	glm::vec3(1.f,-1.f,-1.f),
 	glm::vec3(1.f,1.f,-1.f),
@@ -64,6 +65,7 @@ static const glm::vec3 CUBE_VERTICES[] = {
 	glm::vec3(-1.f,1.f,-1.f),
 	glm::vec3(-1.f,-1.f,-1.f),
 
+	// back
 	glm::vec3(-1.f,-1.f,1.f),
 	glm::vec3(1.f,-1.f,1.f),
 	glm::vec3(1.f, 1.f,1.f),
@@ -71,6 +73,7 @@ static const glm::vec3 CUBE_VERTICES[] = {
 	glm::vec3(-1.f, 1.f,1.f),
 	glm::vec3(-1.f, -1.f,1.f),
 
+	// left
 	glm::vec3(-1.f, 1.f,1.f),
 	glm::vec3(-1.f, 1.f,-1.f),
 	glm::vec3(-1.f, -1.f,-1.f),
@@ -78,6 +81,7 @@ static const glm::vec3 CUBE_VERTICES[] = {
 	glm::vec3(-1.f, -1.f,1.f),
 	glm::vec3(-1.f, 1.f,1.f),
 
+	// right
 	glm::vec3(1.f, 1.f,1.f),
 	glm::vec3(1.f, 1.f,-1.f),
 	glm::vec3(1.f, -1.f,-1.f),
@@ -85,6 +89,7 @@ static const glm::vec3 CUBE_VERTICES[] = {
 	glm::vec3(1.f, -1.f,1.f),
 	glm::vec3(1.f, 1.f,1.f),
 
+	// bottom
 	glm::vec3(-1.f, -1.f, -1.f),
 	glm::vec3(1.f, -1.f, -1.f),
 	glm::vec3(1.f, -1.f,  1.f),
@@ -92,6 +97,7 @@ static const glm::vec3 CUBE_VERTICES[] = {
 	glm::vec3(-1.f, -1.f,  1.f),
 	glm::vec3(-1.f, -1.f, -1.f),
 
+	// top
 	glm::vec3(-1.f,  1.f, -1.f),
 	glm::vec3(1.f,  1.f, -1.f),
 	glm::vec3(1.f,  1.f,  1.f),
@@ -101,6 +107,7 @@ static const glm::vec3 CUBE_VERTICES[] = {
 };
 
 static const glm::vec2 CUBE_UV[] = {
+	// front
 	glm::vec2(0.f, 0.f),
 	glm::vec2(1.f, 0.f),
 	glm::vec2(1.f, 1.f),
@@ -108,6 +115,7 @@ static const glm::vec2 CUBE_UV[] = {
 	glm::vec2(0.f, 1.f),
 	glm::vec2(0.f, 0.f),
 
+	// back
 	glm::vec2(0.f, 0.f),
 	glm::vec2(1.f, 0.f),
 	glm::vec2(1.f, 1.f),
@@ -115,6 +123,7 @@ static const glm::vec2 CUBE_UV[] = {
 	glm::vec2(0.f, 1.f),
 	glm::vec2(0.f, 0.f),
 	
+	// left
 	glm::vec2(1.f, 0.f),
 	glm::vec2(1.f, 1.f),
 	glm::vec2(0.f, 1.f),
@@ -122,6 +131,7 @@ static const glm::vec2 CUBE_UV[] = {
 	glm::vec2(0.f, 0.f),
 	glm::vec2(1.f, 0.f),
 
+	// right
 	glm::vec2(1.f, 0.f),
 	glm::vec2(1.f, 1.f),
 	glm::vec2(0.f, 1.f),
@@ -129,6 +139,7 @@ static const glm::vec2 CUBE_UV[] = {
 	glm::vec2(0.f, 0.f),
 	glm::vec2(1.f, 0.f),
 
+	// bottom
 	glm::vec2(0.f, 1.f),
 	glm::vec2(1.f, 1.f),
 	glm::vec2(1.f, 0.f),
@@ -136,6 +147,7 @@ static const glm::vec2 CUBE_UV[] = {
 	glm::vec2(0.f, 0.f),
 	glm::vec2(0.f, 1.f),
 
+	// top
 	glm::vec2(0.f, 1.f),
 	glm::vec2(1.f, 1.f),
 	glm::vec2(1.f, 0.f),
@@ -144,12 +156,77 @@ static const glm::vec2 CUBE_UV[] = {
 	glm::vec2(0.f, 1.f)
 };
 
+static const glm::vec3 EMPTY_BLOCK[] = {
+	glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
+	glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
+	glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
+	glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
+	glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
+	glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
+	glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
+	glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
+	glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
+	glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
+	glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
+	glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f)
+};
+
 void Chunk::setChunkSize(int size) {
 	int sizeCubed = size * size * size;
 
 	m_chunkSize = size;
 	m_totalVerticesInChunk = sizeCubed * NUM_VERTICES_IN_CUBE;
 	m_totalUvsInChunk = NUM_UVS_IN_CUBE * sizeCubed;
+
+	m_blocks.resize(size);
+
+	for (int x = 0; x < m_blocks.size(); x++)
+	{
+		m_blocks[x].resize(size);
+		for (int y = 0; y < m_blocks.size(); y++)
+		{
+			m_blocks[x][y].resize(size);
+			for (int z = 0; z < m_blocks.size(); z++)
+			{
+				// Don't ask about this... the C++ standard thinks that its being clever
+				std::vector<bool>::reference& block = m_blocks[x][y][z];
+				block = true;
+			}
+		}
+	}
+}
+
+void Chunk::addBlockFaceToGLBuffer(int x, int y, int z, BlockFace face)
+{
+	static const int NUM_VERTS_IN_FACE = 6;
+	static const int SIZEOF_FACE_VERTS_BYTES = NUM_VERTS_IN_FACE * sizeof(glm::vec3);
+
+	const int size = m_chunkSize;
+
+	int i = (x * NUM_VERTICES_IN_CUBE) + size * ((y * NUM_VERTICES_IN_CUBE) + size * (z * NUM_VERTICES_IN_CUBE));
+	int blockMemoryOffsetIndex = static_cast<int>(face) * NUM_VERTS_IN_FACE;
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBufferSubData(GL_ARRAY_BUFFER, i + blockMemoryOffsetIndex, SIZEOF_FACE_VERTS_BYTES, CUBE_VERTICES + blockMemoryOffsetIndex);
+}
+
+void Chunk::addBlockFaceToCPUBuffer(glm::vec3* vertices, int x, int y, int z, BlockFace face)
+{
+	static const int NUM_VERTS_IN_FACE = 6;
+	static const int SIZEOF_FACE_VERTS_BYTES = NUM_VERTS_IN_FACE * sizeof(glm::vec3);
+
+	const int size = m_chunkSize;
+
+	int i = (x * NUM_VERTICES_IN_CUBE) + size * ((y * NUM_VERTICES_IN_CUBE) + size * (z * NUM_VERTICES_IN_CUBE));
+	int blockMemoryOffsetIndex = static_cast<int>(face) * NUM_VERTS_IN_FACE;
+
+	memcpy(vertices + i + blockMemoryOffsetIndex, CUBE_VERTICES + blockMemoryOffsetIndex, SIZEOF_FACE_VERTS_BYTES);
+	for (int j = i + blockMemoryOffsetIndex; j < i + blockMemoryOffsetIndex + NUM_VERTS_IN_FACE; j++)
+	{
+		vertices[j].x += x * 2;
+		vertices[j].y += y * 2;
+		vertices[j].z += z * 2;
+	}
 }
 
 void Chunk::fill(int size)
@@ -179,17 +256,17 @@ void Chunk::fill(int size)
 				// the first NUM_VERTICES_IN_CUBE number of vertices, 
 				// the second block is represented by the second NUM_VERTICES_IN_CUBE set of vertices. etc...
 
-				int iv = (x * NUM_VERTICES_IN_CUBE) + size * ((y * NUM_VERTICES_IN_CUBE) + size * (z * NUM_VERTICES_IN_CUBE));
-				std::memcpy(chunkVertices + iv, CUBE_VERTICES, sizeof(CUBE_VERTICES));
-				
-				for (int j = iv; j < iv + NUM_VERTICES_IN_CUBE; j++)
-				{
-					chunkVertices[j].x += x * 2;
-					chunkVertices[j].y += y * 2;
-					chunkVertices[j].z += z * 2;
-				}
+				int i = (x * NUM_VERTICES_IN_CUBE) + size * ((y * NUM_VERTICES_IN_CUBE) + size * (z * NUM_VERTICES_IN_CUBE));
+				std::memcpy(chunkVertices + i, EMPTY_BLOCK, sizeof(EMPTY_BLOCK));
+				std::memcpy(chunkUVs + i, CUBE_UV, sizeof(CUBE_UV));
 
-				std::memcpy(chunkUVs + iv, CUBE_UV, sizeof(CUBE_UV));
+				if (x == 0) addBlockFaceToCPUBuffer(chunkVertices, x, y, z, BlockFace::LEFT);
+				if (y == 0) addBlockFaceToCPUBuffer(chunkVertices, x, y, z, BlockFace::BOTTOM);
+				if (z == 0) addBlockFaceToCPUBuffer(chunkVertices, x, y, z, BlockFace::FRONT);
+
+				if (x == size - 1) addBlockFaceToCPUBuffer(chunkVertices, x, y, z, BlockFace::RIGHT);
+				if (y == size - 1) addBlockFaceToCPUBuffer(chunkVertices, x, y, z, BlockFace::TOP);
+				if (z == size - 1) addBlockFaceToCPUBuffer(chunkVertices, x, y, z, BlockFace::BACK);
 			}
 		}
 	}
@@ -211,8 +288,10 @@ void Chunk::fill(int size)
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (void*)0);
 	glEnableVertexAttribArray(1);
 
-
 	m_filled = true;
+
+	delete chunkVertices;
+	delete chunkUVs;
 }
 
 void Chunk::placeBlockAt(int x, int y, int z)
@@ -223,10 +302,9 @@ void Chunk::placeBlockAt(int x, int y, int z)
 	if (x < 0 || y < 0 || z < 0)
 		return;
 
-	int iv = ((x * NUM_VERTICES_IN_CUBE) + m_chunkSize * ((y * NUM_VERTICES_IN_CUBE) + m_chunkSize * (z * NUM_VERTICES_IN_CUBE))) * sizeof(glm::vec3);
+	m_blocks[x][y][z] = true;
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferSubData(GL_ARRAY_BUFFER, iv, sizeof(CUBE_VERTICES), CUBE_VERTICES);
+
 }
 
 void Chunk::destroyBlockAt(int x, int y, int z)
@@ -237,20 +315,7 @@ void Chunk::destroyBlockAt(int x, int y, int z)
 	if (x < 0 || y < 0 || z < 0)
 		return;
 
-	static const glm::vec3 EMPTY_BLOCK[] = {
-		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
-		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
-		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
-		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
-		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
-		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
-		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
-		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
-		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
-		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
-		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
-		glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f)
-	};
+	m_blocks[z][y][z] = false;
 
 	int iv = ((x * NUM_VERTICES_IN_CUBE) + m_chunkSize * ((y * NUM_VERTICES_IN_CUBE) + m_chunkSize * (z * NUM_VERTICES_IN_CUBE))) * sizeof(glm::vec3);
 

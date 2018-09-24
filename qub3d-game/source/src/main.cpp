@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 	qub3d::Chunk chunk;
 	chunk.fill(4);
 
-	glm::mat4 projection = glm::perspective(45.f, 1280.f / 720.f, 0.1f, 100.f);
+	glm::mat4 projection = glm::perspective(45.f, 1280.f / 720.f, 0.1f, 1000.f);
 
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(198 / 255.f, 220 / 255.f, 255 / 255.f, 1.f);
@@ -69,8 +69,12 @@ int main(int argc, char** argv)
 	int chunkSize = 4;
 	float colorMapRange = 4.f;
 
-	int editPos[3];
-	std::memset(editPos, 0, sizeof(editPos));
+	int destroyPos[3];
+	std::memset(destroyPos, 0, sizeof(destroyPos));
+
+	int placePos[3];
+	std::memset(placePos, 0, sizeof(placePos));
+
 
 	bool wireframe = false;
 
@@ -87,10 +91,15 @@ int main(int argc, char** argv)
 			glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
 		}
 
-		if (ImGui::InputInt3("Destroy block at", editPos))
-			chunk.destroyBlockAt(editPos[0], editPos[1], editPos[2]);
-		if (ImGui::InputInt3("Place block at", editPos))
-			chunk.placeBlockAt(editPos[0], editPos[1], editPos[2]);
+		if (ImGui::Button("Destroy"))
+			chunk.destroyBlockAt(destroyPos[0], destroyPos[1], destroyPos[2]);
+		ImGui::SameLine();
+		ImGui::InputInt3("Destroy block at", destroyPos);
+		
+		if (ImGui::Button("Place"))
+			chunk.placeBlockAt(placePos[0], placePos[1], placePos[2]);
+		ImGui::SameLine();
+		ImGui::InputInt3("Place block at", placePos);
 
 		ImGui::End();
 
