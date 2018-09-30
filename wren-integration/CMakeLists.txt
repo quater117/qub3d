@@ -66,6 +66,10 @@ set(include_dirs
 set(EXECUTABLE_OUTPUT_PATH ../../COMPILE/bin)
 
 add_executable(${PROJECT_NAME} ${client_sources} ${clientHeaders})
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED ON
+    CXX_EXTENSIONS OFF)
 target_link_libraries(${PROJECT_NAME} SDL2-static SDL2main WrenVM)
 
 include_directories(${include_dirs})
