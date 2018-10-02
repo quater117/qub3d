@@ -103,7 +103,7 @@ static const glm::vec3 CUBE_VERTICES[] = {
 	glm::vec3(1.f,  1.f,  1.f),
 	glm::vec3(1.f,  1.f,  1.f),
 	glm::vec3(-1.f,  1.f,  1.f),
-	glm::vec3(-1.f,  1.f, -1.f),
+	glm::vec3(-1.f,  1.f, -1.f)
 };
 
 static const glm::vec2 CUBE_UV[] = {
@@ -196,21 +196,7 @@ void Chunk::setChunkSize(int size) {
 	}
 }
 
-void Chunk::addBlockFaceToGLBuffer(int x, int y, int z, BlockFace face)
-{
-	static const int NUM_VERTS_IN_FACE = 6;
-	static const int SIZEOF_FACE_VERTS_BYTES = NUM_VERTS_IN_FACE * sizeof(glm::vec3);
-
-	const int size = m_chunkSize;
-
-	int i = (x * NUM_VERTICES_IN_CUBE) + size * ((y * NUM_VERTICES_IN_CUBE) + size * (z * NUM_VERTICES_IN_CUBE));
-	int blockMemoryOffsetIndex = static_cast<int>(face) * NUM_VERTS_IN_FACE;
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferSubData(GL_ARRAY_BUFFER, i + blockMemoryOffsetIndex, SIZEOF_FACE_VERTS_BYTES, CUBE_VERTICES + blockMemoryOffsetIndex);
-}
-
-void Chunk::addBlockFaceToCPUBuffer(glm::vec3* vertices, int x, int y, int z, BlockFace face)
+void Chunk::addBlockFace(glm::vec3* vertices, int x, int y, int z, BlockFace face)
 {
 	static const int NUM_VERTS_IN_FACE = 6;
 	static const int SIZEOF_FACE_VERTS_BYTES = NUM_VERTS_IN_FACE * sizeof(glm::vec3);
@@ -245,32 +231,22 @@ void Chunk::fill(int size)
 		{
 			for (int x = 0; x < size; x++)
 			{
-				// This might look very scary, but it's really not.
-				// Basically it derives from the algorithm to convert 3D array indices/coordinates into a 1D array
-				// coordinate.
-				//
-				// ALGORITHM:
-				//			x + width * (y + depth * z)
-				//
-				// the (x,y,z) coordinates get multiplied out by the NUM_VERTICES_IN_CUBE because the first block is represented by
-				// the first NUM_VERTICES_IN_CUBE number of vertices, 
-				// the second block is represented by the second NUM_VERTICES_IN_CUBE set of vertices. etc...
-
 				int i = (x * NUM_VERTICES_IN_CUBE) + size * ((y * NUM_VERTICES_IN_CUBE) + size * (z * NUM_VERTICES_IN_CUBE));
+				
 				std::memcpy(chunkVertices + i, EMPTY_BLOCK, sizeof(EMPTY_BLOCK));
 				std::memcpy(chunkUVs + i, CUBE_UV, sizeof(CUBE_UV));
 
-				if (x == 0) addBlockFaceToCPUBuffer(chunkVertices, x, y, z, BlockFace::LEFT);
-				if (y == 0) addBlockFaceToCPUBuffer(chunkVertices, x, y, z, BlockFace::BOTTOM);
-				if (z == 0) addBlockFaceToCPUBuffer(chunkVertices, x, y, z, BlockFace::FRONT);
+				if (x == 0) addBlockFace(chunkVertices, x, y, z, BlockFace::LEFT);
+				if (y == 0) addBlockFace(chunkVertices, x, y, z, BlockFace::BOTTOM);
+				if (z == 0) addBlockFace(chunkVertices, x, y, z, BlockFace::FRONT);
 
-				if (x == size - 1) addBlockFaceToCPUBuffer(chunkVertices, x, y, z, BlockFace::RIGHT);
-				if (y == size - 1) addBlockFaceToCPUBuffer(chunkVertices, x, y, z, BlockFace::TOP);
-				if (z == size - 1) addBlockFaceToCPUBuffer(chunkVertices, x, y, z, BlockFace::BACK);
+				if (x == size - 1) addBlockFace(chunkVertices, x, y, z, BlockFace::RIGHT);
+				if (y == size - 1) addBlockFace(chunkVertices, x, y, z, BlockFace::TOP);
+				if (z == size - 1) addBlockFace(chunkVertices, x, y, z, BlockFace::BACK);
 			}
 		}
 	}
-
+	
 	glGenVertexArrays(1, &m_vao);
 	glBindVertexArray(m_vao);
 
@@ -292,6 +268,63 @@ void Chunk::fill(int size)
 
 	delete chunkVertices;
 	delete chunkUVs;
+
+}
+
+std::unordered_map<glm::ivec3, BlockFace> Chunk::getSurroundingFaces(int x, int y, int z)
+{
+	const int size = m_chunkSize;
+	std::unordered_map<glm::ivec3, BlockFace> faces;
+
+	if (x > 0) faces.insert(std::make_pair(glm::ivec3(x - 1, y, z ), BlockFace::RIGHT));
+	if (x < size - 1) faces.insert(std::make_pair(glm::ivec3(x + 1, y, z), BlockFace::LEFT));
+
+	if (y > 0) faces.insert(std::make_pair(glm::ivec3(x, y - 1, z), BlockFace::TOP));
+	if (y < size - 1) faces.insert(std::make_pair(glm::ivec3(x, y + 1, z), BlockFace::BOTTOM));
+	
+	if (z > 0) faces.insert(std::make_pair(glm::ivec3(x, y, z - 1), BlockFace::BACK));
+	if (z < size - 1) faces.insert(std::make_pair(glm::ivec3(x, y, z + 1), BlockFace::FRONT));
+
+	for (auto it = faces.begin(); it != faces.end();) {
+		bool b = m_blocks[it->first.x][it->first.y][it->first.z];
+
+		if (!b) {
+			it = faces.erase(it);
+		}
+		else {
+			it++;
+		}
+	}
+
+	return faces;
+}
+
+void Chunk::removeBlockFace(glm::vec3* vertices, int x, int y, int z, BlockFace face)
+{
+	static const int NUM_VERTS_IN_FACE = 6;
+	
+	const int size = m_chunkSize;
+
+	int i = (x * NUM_VERTICES_IN_CUBE) + size * ((y * NUM_VERTICES_IN_CUBE) + size * (z * NUM_VERTICES_IN_CUBE));
+	int blockMemoryOffsetIndex = static_cast<int>(face) * NUM_VERTS_IN_FACE;
+
+	for (int j = i + blockMemoryOffsetIndex; j < i + blockMemoryOffsetIndex + NUM_VERTS_IN_FACE; j++) {
+		vertices[j].x = 0.f;
+		vertices[j].y = 0.f;
+		vertices[j].z = 0.f;
+	}
+}
+
+static BlockFace getOppositeBlockFace(BlockFace face)
+{
+	switch (face) {
+	case BlockFace::FRONT: return BlockFace::BACK;
+	case BlockFace::BACK: return BlockFace::FRONT;
+	case BlockFace::LEFT: return BlockFace::RIGHT;
+	case BlockFace::RIGHT: return BlockFace::LEFT;
+	case BlockFace::BOTTOM: return BlockFace::TOP;
+	case BlockFace::TOP: return BlockFace::BOTTOM;
+	}
 }
 
 void Chunk::placeBlockAt(int x, int y, int z)
@@ -303,8 +336,23 @@ void Chunk::placeBlockAt(int x, int y, int z)
 		return;
 
 	m_blocks[x][y][z] = true;
+	//int iv = ((x * NUM_VERTICES_IN_CUBE) + m_chunkSize * ((y * NUM_VERTICES_IN_CUBE) + m_chunkSize * (z * NUM_VERTICES_IN_CUBE))) * sizeof(glm::vec3);
 
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	auto surroundingFaces = this->getSurroundingFaces(x, y, z);
+	
+	glm::vec3* vertices = (glm::vec3*) glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
+	for (auto face : surroundingFaces) 
+	{
+		glm::ivec3 pos = face.first;
+		BlockFace f = face.second;
+
+		this->removeBlockFace(vertices, pos.x, pos.y, pos.z, f);
+		this->addBlockFace(vertices, x, y, z, f);
+	}
+
+	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
 void Chunk::destroyBlockAt(int x, int y, int z)
@@ -315,12 +363,23 @@ void Chunk::destroyBlockAt(int x, int y, int z)
 	if (x < 0 || y < 0 || z < 0)
 		return;
 
-	m_blocks[z][y][z] = false;
+	m_blocks[x][y][z] = false;
 
 	int iv = ((x * NUM_VERTICES_IN_CUBE) + m_chunkSize * ((y * NUM_VERTICES_IN_CUBE) + m_chunkSize * (z * NUM_VERTICES_IN_CUBE))) * sizeof(glm::vec3);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, iv, sizeof(EMPTY_BLOCK), EMPTY_BLOCK);
+
+	auto surroundingFaces = this->getSurroundingFaces(x, y, z);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glm::vec3* vertices = (glm::vec3*) glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+
+	for (auto face : surroundingFaces) {
+		glm::ivec3 pos = face.first;
+		this->addBlockFace(vertices, pos.x, pos.y, pos.z, face.second);
+	}
+
+	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
 void Chunk::draw()

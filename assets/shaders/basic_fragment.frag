@@ -23,6 +23,6 @@ void main()
 	col.r = map(col.r, -1.0f, fmax, 0.0f, 1.0f);
 	col.g = map(col.g, -1.0f, fmax, 0.0f, 1.0f);
 	col.b = map(col.b, -1.0f, fmax, 0.0f, 1.0f);
-	
+	col = vec3(1.0f, 1.0f, 1.0f);
     FragColor = vec4(col, 1.f) * texture(texture1, pass_uv);
 } 

@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 	qub3d::FlyCamera camera(window);
 	
 	qub3d::Texture2D texture;
-	texture.load("assets/textures/dirt.png");
+	texture.load("assets/textures/blocks/gravel.png");
 	texture.bind(0);
 
 	qub3d::Chunk chunk;

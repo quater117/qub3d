@@ -43,7 +43,6 @@ namespace qub3d
 
 		glm::mat4 calculateViewMatrix() const;
 
-		void processInputs();
 		void tick(float dt);
 
 		bool enabled;

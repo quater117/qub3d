@@ -32,7 +32,11 @@
 
 #include <GL/glew.h>
 #include <glm/vec3.hpp>
+
 #include <vector>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
+#include <unordered_map>
 
 namespace qub3d
 {
@@ -68,8 +72,10 @@ namespace qub3d
 		void destroyOpenGLData();
 		void setChunkSize(int size);
 
-		void addBlockFaceToCPUBuffer(glm::vec3* vertices, int x, int y, int z, BlockFace face);
-		void addBlockFaceToGLBuffer(int x, int y, int z, BlockFace face);
+		std::unordered_map<glm::ivec3, BlockFace> getSurroundingFaces(int x, int y, int z);
+
+		void addBlockFace(glm::vec3* vertices, int x, int y, int z, BlockFace face);
+		void removeBlockFace(glm::vec3 *vertices, int x, int y, int z, BlockFace face);
 
 	private:
 		GLuint m_vao, m_vbo, m_ebo, m_tbo;
