@@ -1,5 +1,5 @@
 /*
-*	 Copyright (C) 2018 Qub³d Engine Group.
+*	 Copyright (C) 2018 QubÂ³d Engine Group.
 *	 All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without modification,
