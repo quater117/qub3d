@@ -37,15 +37,15 @@ using namespace qub3d;
 
 std::string File::readAllText(const std::string& filepath)
 {
-	SDL_RWops *rwops = SDL_RWFromFile(filepath.c_str(), "r");
-	size_t fileSize = SDL_RWsize(rwops);
+    SDL_RWops *rwops = SDL_RWFromFile(filepath.c_str(), "r");
+    size_t fileSize = SDL_RWsize(rwops);
 
-	std::string text;
-	text.resize(fileSize);
+    std::string text;
+    text.resize(fileSize);
 
-	SDL_RWread(rwops, (void*)text.data(), sizeof(char), fileSize);
+    SDL_RWread(rwops, (void*)text.data(), sizeof(char), fileSize);
 
-	return text;
+    return text;
 }
 
 // It needs to be done somewhere ¯\_(ツ)_/¯
