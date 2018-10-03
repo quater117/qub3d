@@ -42,11 +42,16 @@ set(headers_dir ${PROJECT_SOURCE_DIR}/include)
 
 set(engine_sources
 	${source_dir}/engine.cpp
+
+        ${source_dir}/graphics/window.cpp
 )
 
 set(engine_headers
 	${headers_dir}/engine/engine.hpp
         ${headers_dir}/engine/os.hpp
+        ${headers_dir}/engine/common.hpp
+
+        ${headers_dir}/engine/graphics/window.hpp
 )
 
 if(APPLE)
