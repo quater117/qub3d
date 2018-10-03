@@ -44,8 +44,8 @@ namespace qub3d
 	{
 		FRONT = 0,
 		BACK = 1,
-		LEFT = 2,
-		RIGHT = 3,
+		RIGHT = 2,
+		LEFT = 3,
 		BOTTOM = 4,
 		TOP = 5
 	};
@@ -58,7 +58,7 @@ namespace qub3d
 		Chunk();
 
 		void fill(int size);
-
+		
 		inline GLuint getVAO() const { return m_vao; }
 		inline GLuint getVBO() const { return m_vbo; }
 		inline GLuint getEBO() const { return m_ebo; }
@@ -71,8 +71,7 @@ namespace qub3d
 	private:
 		void destroyOpenGLData();
 		void setChunkSize(int size);
-
-		std::unordered_map<glm::ivec3, BlockFace> getSurroundingFaces(int x, int y, int z);
+		void build();
 
 		void addBlockFace(glm::vec3* vertices, int x, int y, int z, BlockFace face);
 		void removeBlockFace(glm::vec3 *vertices, int x, int y, int z, BlockFace face);
