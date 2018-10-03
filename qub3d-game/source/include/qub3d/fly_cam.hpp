@@ -46,6 +46,10 @@ namespace qub3d
 		void tick(float dt);
 
 		bool enabled;
+
+		glm::vec3 getPosition() { return m_position; }
+		glm::vec3 getDirection() { return m_direction; }
+
 	private:
 		Window& m_window;
 

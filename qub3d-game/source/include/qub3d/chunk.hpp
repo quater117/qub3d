@@ -50,10 +50,16 @@ namespace qub3d
 		TOP = 5
 	};
 
+	enum class BlockType
+	{
+		AIR,
+		STONE
+	};
+
 	class Chunk
 	{
 	public:
-		typedef std::vector<std::vector<std::vector<bool>>> CPUBlockArray;
+		typedef std::vector<std::vector<std::vector<BlockType>>> CPUBlockArray;
 
 		Chunk();
 
@@ -67,7 +73,9 @@ namespace qub3d
 
 		void placeBlockAt(int x, int y, int z);
 		void destroyBlockAt(int x, int y, int z);
-	
+		
+		BlockType getBlockAtPos(float x, float y, float z);
+
 	private:
 		void destroyOpenGLData();
 		void setChunkSize(int size);

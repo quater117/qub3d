@@ -189,8 +189,7 @@ void Chunk::setChunkSize(int size) {
 			for (int z = 0; z < m_blocks.size(); z++)
 			{
 				// Don't ask about this... the C++ standard thinks that its being clever
-				std::vector<bool>::reference& block = m_blocks[x][y][z];
-				block = true;
+				m_blocks[x][y][z] = BlockType::STONE;
 			}
 		}
 	}
@@ -216,16 +215,16 @@ void qub3d::Chunk::build()
 				std::memcpy(chunkVertices + i, EMPTY_BLOCK, sizeof(EMPTY_BLOCK));
 				std::memcpy(chunkUVs + i, CUBE_UV, sizeof(CUBE_UV));
 
-				if (!m_blocks[x][y][z]) continue;
+				if (m_blocks[x][y][z] == BlockType::AIR) continue;
 
-				if (x == 0 || !m_blocks[x - 1][y][z]) addBlockFace(chunkVertices, x, y, z, BlockFace::RIGHT);
-				if (x == size - 1 || !m_blocks[x + 1][y][z]) addBlockFace(chunkVertices, x, y, z, BlockFace::LEFT);
+				if (x == 0 || m_blocks[x - 1][y][z] == BlockType::AIR) addBlockFace(chunkVertices, x, y, z, BlockFace::RIGHT);
+				if (x == size - 1 || m_blocks[x + 1][y][z] == BlockType::AIR) addBlockFace(chunkVertices, x, y, z, BlockFace::LEFT);
 
-				if (y == 0 || !m_blocks[x][y - 1][z]) addBlockFace(chunkVertices, x, y, z, BlockFace::BOTTOM);
-				if (y == size - 1 || !m_blocks[x][y + 1][z]) addBlockFace(chunkVertices, x, y, z, BlockFace::TOP);
+				if (y == 0 || m_blocks[x][y - 1][z] == BlockType::AIR) addBlockFace(chunkVertices, x, y, z, BlockFace::BOTTOM);
+				if (y == size - 1 || m_blocks[x][y + 1][z] == BlockType::AIR) addBlockFace(chunkVertices, x, y, z, BlockFace::TOP);
 
-				if (z == 0 || !m_blocks[x][y][z - 1]) addBlockFace(chunkVertices, x, y, z, BlockFace::FRONT);
-				if (z == size - 1 || !m_blocks[x][y][z + 1]) addBlockFace(chunkVertices, x, y, z, BlockFace::BACK);
+				if (z == 0 || m_blocks[x][y][z - 1] == BlockType::AIR) addBlockFace(chunkVertices, x, y, z, BlockFace::FRONT);
+				if (z == size - 1 || m_blocks[x][y][z + 1] == BlockType::AIR) addBlockFace(chunkVertices, x, y, z, BlockFace::BACK);
 			}
 		}
 	}
@@ -304,7 +303,7 @@ void Chunk::placeBlockAt(int x, int y, int z)
 	if (x < 0 || y < 0 || z < 0)
 		return;
 
-	m_blocks[x][y][z] = true;
+	m_blocks[x][y][z] = BlockType::STONE;
 	build();
 
 }
@@ -317,9 +316,16 @@ void Chunk::destroyBlockAt(int x, int y, int z)
 	if (x < 0 || y < 0 || z < 0)
 		return;
 
-	m_blocks[x][y][z] = false;
+	m_blocks[x][y][z] = BlockType::AIR;
 
 	build();
+}
+
+BlockType Chunk::getBlockAtPos(float x, float y, float z)
+{
+	if (x < 0 || y < 0 || z < 0) return BlockType::AIR;
+	if (x > m_chunkSize || y > m_chunkSize || z > m_chunkSize) return BlockType::AIR;
+	return m_blocks[(int)x][(int)y][(int)z];
 }
 
 void Chunk::draw()

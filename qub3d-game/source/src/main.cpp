@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 	qub3d::FlyCamera camera(window);
 	
 	qub3d::Texture2D texture;
-	texture.load("assets/textures/blocks/gravel.png");
+	texture.load("assets/textures/blocks/stone.png");
 	texture.bind(0);
 
 	qub3d::Chunk chunk;
@@ -75,8 +75,30 @@ int main(int argc, char** argv)
 	int placePos[3];
 	std::memset(placePos, 0, sizeof(placePos));
 
-
 	bool wireframe = false;
+
+	const float RAY_INCREMENT = 0.5f;
+	const float PICKING_RANGE = 32.f;
+	window.addEventHandler([&](SDL_Event& e) {
+		if (e.type == SDL_MOUSEBUTTONUP) {
+			/*glm::vec3 pos = camera.getPosition() + camera.getDirection();
+			using namespace qub3d;
+			float ray = 0.f;
+			while (ray < PICKING_RANGE) {
+				pos += camera.getDirection() * RAY_INCREMENT;
+
+				printf("%f %f %f\n", pos.x, pos.y, pos.z);
+				pos /= 2.f;
+				BlockType t = chunk.getBlockAtPos(pos.x, pos.y, pos.z);
+				if (t != BlockType::AIR) {
+					chunk.destroyBlockAt(pos.x, pos.y, pos.z);
+					return;
+				}
+
+				ray += RAY_INCREMENT;
+			}*/
+		}
+	});
 
 	unsigned int lastTicks = SDL_GetTicks();
 	while (window.isRunning())
@@ -115,7 +137,7 @@ int main(int argc, char** argv)
 		pipeline.setUniform("colorMapRange", colorMapRange);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+		
 		chunk.draw();
 
 		window.swapBuffers();
