@@ -1,4 +1,4 @@
-﻿/*
+/*
 *	 Copyright (C) 2018 Qub³d Engine Group.
 *	 All rights reserved.
 *
