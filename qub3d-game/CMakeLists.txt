@@ -1,4 +1,4 @@
-#
+﻿#
 #	 Copyright (C) 2018 Qub³d Engine Group.
 #	 All rights reserved.
 #
@@ -37,8 +37,8 @@ project(qub3d-game)
 
 set(libdeps ${CMAKE_CURRENT_LIST_DIR}/../libdeps)
 
-set(source_dir ${PROJECT_SOURCE_DIR}/source/src)
-set(headers_dir ${PROJECT_SOURCE_DIR}/source/include/qub3d)
+set(source_dir ${PROJECT_SOURCE_DIR}/src)
+set(headers_dir ${PROJECT_SOURCE_DIR}/include/qub3d)
 
 set(client_sources
 	${source_dir}/main.cpp
@@ -89,10 +89,10 @@ if (UNIX AND NOT APPLE)
 	find_package(Threads REQUIRED)
 	list(APPEND library_dirs
 		${CMAKE_DL_LIBS}
-        ${CMAKE_THREAD_LIBS_INIT}
-        ${X11_LIBRARIES}
-        ${X11_Xxf86vm_LIB}
-        GL
+        	${CMAKE_THREAD_LIBS_INIT}
+        	${X11_LIBRARIES}
+        	${X11_Xxf86vm_LIB}
+        	GL
 	)
 
 endif()
