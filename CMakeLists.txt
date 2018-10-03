@@ -5,4 +5,4 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 add_subdirectory(libdeps)
 add_subdirectory(qub3d-game)
-
+add_subdirectory(qub3d-engine)
