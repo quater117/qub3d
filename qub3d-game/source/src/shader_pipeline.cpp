@@ -56,7 +56,6 @@ GLint ShaderPipeline::getUniformLocation(const std::string& uniformName)
 		}
 		else
 		{
-			printf("Cannot find uniform: %s", uniformName.c_str());
 			return location;
 		}
 	}

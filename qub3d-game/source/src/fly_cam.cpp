@@ -40,13 +40,13 @@ FlyCamera::FlyCamera(Window& window) :
 	m_rotation(0.f),
 	enabled(true)
 {
-	//SDL_ShowCursor(SDL_FALSE);
+	SDL_ShowCursor(SDL_FALSE);
 
 	window.addEventHandler([&](SDL_Event& e) {
 		if (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
 		{
 			enabled = !enabled;
-		//	SDL_ShowCursor(!enabled);
+			SDL_ShowCursor(!enabled);
 		}
 	});
 }

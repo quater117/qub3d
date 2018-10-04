@@ -81,22 +81,24 @@ int main(int argc, char** argv)
 	const float PICKING_RANGE = 32.f;
 	window.addEventHandler([&](SDL_Event& e) {
 		if (e.type == SDL_MOUSEBUTTONUP) {
-			/*glm::vec3 pos = camera.getPosition() + camera.getDirection();
 			using namespace qub3d;
+			glm::vec3 p = camera.getPosition() + camera.getDirection();
+			p.x = std::round(+p.x);
+			p.y = std::round(+p.y);
+			p.z = std::round(+p.z);
+			p /= 2.f;
+			p += 0.5f;
 			float ray = 0.f;
 			while (ray < PICKING_RANGE) {
-				pos += camera.getDirection() * RAY_INCREMENT;
-
-				printf("%f %f %f\n", pos.x, pos.y, pos.z);
-				pos /= 2.f;
-				BlockType t = chunk.getBlockAtPos(pos.x, pos.y, pos.z);
+				p += camera.getDirection() * RAY_INCREMENT;
+				BlockType t = chunk.getBlockAtPos(p.x, p.y, p.z);
 				if (t != BlockType::AIR) {
-					chunk.destroyBlockAt(pos.x, pos.y, pos.z);
+					chunk.destroyBlockAt(p.x, p.y, p.z);
 					return;
 				}
 
 				ray += RAY_INCREMENT;
-			}*/
+			}
 		}
 	});
 
