@@ -1,5 +1,5 @@
 /*
-*	 Copyright (C) 2018 Qub�d Engine Group.
+*	 Copyright (C) 2018 Qub³d Engine Group.
 *	 All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without modification,
@@ -28,28 +28,26 @@
 *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#pragma once
+#include <qub3d/io.hpp>
 
-#include <GL/glew.h>
+#include <SDL.h>
+#include <vector>
 
-#include <string>
+using namespace qub3d;
 
-namespace qub3d
+std::string File::readAllText(const std::string& filepath)
 {
-	class Texture2D
-	{
-	public:
-		Texture2D();
+    SDL_RWops *rwops = SDL_RWFromFile(filepath.c_str(), "r");
+    size_t fileSize = SDL_RWsize(rwops);
 
-		void load(const std::string& textureFilepath);
-		
-		inline GLuint getTextureID() const { return m_id; }
+    std::string text;
+    text.resize(fileSize);
 
-		void bind(int textureSlot);
-		void unbind();
+    SDL_RWread(rwops, (void*)text.data(), sizeof(char), fileSize);
 
-	private:
-		GLuint m_id;
-		int m_width, m_height;
-	};
+    return text;
 }
+
+// It needs to be done somewhere ¯\_(ツ)_/¯
+#define STB_IMAGE_IMPLEMENTATION
+#include <qub3d/stb_image.h>

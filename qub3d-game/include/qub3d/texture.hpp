@@ -1,5 +1,5 @@
 /*
-*	 Copyright (C) 2018 Qub³d Engine Group.
+*	 Copyright (C) 2018 QubÂ³d Engine Group.
 *	 All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without modification,
@@ -28,38 +28,28 @@
 *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <qub3d/texture.hpp>
-#include <qub3d/stb_image.h>
+#pragma once
 
-using namespace qub3d;
+#include <GL/glew.h>
 
-Texture2D::Texture2D() :
-	m_width(0), m_height(0), m_id(-1)
-{}
+#include <string>
 
-void Texture2D::load(const std::string& textureFilepath)
+namespace qub3d
 {
-	int nChannels;
-	unsigned char* data = stbi_load(textureFilepath.c_str(), &m_width, &m_height, &nChannels, 0);
+	class Texture2D
+	{
+	public:
+		Texture2D();
 
-	glGenTextures(1, &m_id);
-	glBindTexture(GL_TEXTURE_2D, m_id);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		void load(const std::string& textureFilepath);
+		
+		inline GLuint getTextureID() const { return m_id; }
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		void bind(int textureSlot);
+		void unbind();
 
-	stbi_image_free(data);
-}
-
-void Texture2D::bind(int slot)
-{
-	// Trust me this is safe & standard defined :D
-	glActiveTexture(GL_TEXTURE0 + slot);
-	glBindTexture(GL_TEXTURE_2D, m_id);
-}
-
-void Texture2D::unbind()
-{
-	glBindTexture(GL_TEXTURE_2D, 0);
+	private:
+		GLuint m_id;
+		int m_width, m_height;
+	};
 }

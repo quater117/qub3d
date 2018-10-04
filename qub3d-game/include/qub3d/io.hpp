@@ -1,4 +1,4 @@
-﻿/*
+/*
 *	 Copyright (C) 2018 Qub³d Engine Group.
 *	 All rights reserved.
 *
@@ -28,26 +28,16 @@
 *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <qub3d/io.hpp>
+#pragma once
 
-#include <SDL.h>
+#include <string>
 #include <vector>
 
-using namespace qub3d;
-
-std::string File::readAllText(const std::string& filepath)
+namespace qub3d
 {
-	SDL_RWops *rwops = SDL_RWFromFile(filepath.c_str(), "r");
-	size_t fileSize = SDL_RWsize(rwops);
-
-	std::string text;
-	text.resize(fileSize);
-
-	SDL_RWread(rwops, (void*)text.data(), sizeof(char), fileSize);
-
-	return text;
+	class File
+	{
+	public:
+		static std::string readAllText(const std::string& filepath);
+	};
 }
-
-// It needs to be done somewhere ¯\_(ツ)_/¯
-#define STB_IMAGE_IMPLEMENTATION
-#include <qub3d/stb_image.h>

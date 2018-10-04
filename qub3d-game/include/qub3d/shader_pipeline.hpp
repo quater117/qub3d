@@ -1,5 +1,5 @@
 /*
-*	 Copyright (C) 2018 Qub³d Engine Group.
+*	 Copyright (C) 2018 QubÂ³d Engine Group.
 *	 All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without modification,
@@ -30,30 +30,60 @@
 
 #pragma once
 
-#include <qub3d/window.hpp>
+#include <qub3d/opengl.hpp>
+
+#include <string>
+#include <vector>
+#include <unordered_map>
 
 #include <glm/glm.hpp>
 
 namespace qub3d
 {
-	class FlyCamera
+	enum class ShaderPipelineStage
+	{
+		VERTEX = GL_VERTEX_SHADER,
+		FRAGMENT = GL_FRAGMENT_SHADER
+	};
+
+	class ShaderPipeline
 	{
 	public:
-		FlyCamera(Window& window);
+		void addStage(ShaderPipelineStage stage, const std::string& shaderFilepath);
+		void build();
 
-		glm::mat4 calculateViewMatrix() const;
+		void bind();
+		void unbind();
 
-		void tick(float dt);
+		inline GLuint getProgramID() const { return m_program; }
 
-		bool enabled;
+		void destroy();
 
-		glm::vec3 getPosition() { return m_position; }
-		glm::vec3 getDirection() { return m_direction; }
+		GLint getUniformLocation(const std::string& uniformName);
+
+		void setUniform(const std::string& uniformName, glm::mat4& matrix);
+		void setUniform(const std::string& uniformName, float& value);
+
+		void debugGUI();
+
+		template <typename T>
+		T* getUniformValuePtr(const std::string& uniformName)
+		{
+			return (T*)m_uniformValueMap[uniformName];
+		}
 
 	private:
-		Window& m_window;
+		template <typename T>
+		void updateUniformValue(const std::string& name, T& value)
+		{
+			m_uniformValueMap[name] = static_cast<void*>(&value);
+		}
 
-		glm::vec3 m_position, m_direction, m_up;
-		glm::vec2 m_rotation;
+	private:
+		GLuint m_program;
+
+		std::vector<GLuint> m_shaderIDs;
+		std::unordered_map<std::string, GLint> m_uniformLocationMap;
+		std::unordered_map<std::string, void*> m_uniformValueMap;
 	};
 }

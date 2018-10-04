@@ -1,5 +1,5 @@
 /*
-*	 Copyright (C) 2018 Qub³d Engine Group.
+*	 Copyright (C) 2018 QubÂ³d Engine Group.
 *	 All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without modification,
@@ -30,14 +30,30 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
+#include <qub3d/window.hpp>
+
+#include <glm/glm.hpp>
 
 namespace qub3d
 {
-	class File
+	class FlyCamera
 	{
 	public:
-		static std::string readAllText(const std::string& filepath);
+		FlyCamera(Window& window);
+
+		glm::mat4 calculateViewMatrix() const;
+
+		void tick(float dt);
+
+		bool enabled;
+
+		glm::vec3 getPosition() { return m_position; }
+		glm::vec3 getDirection() { return m_direction; }
+
+	private:
+		Window& m_window;
+
+		glm::vec3 m_position, m_direction, m_up;
+		glm::vec2 m_rotation;
 	};
 }

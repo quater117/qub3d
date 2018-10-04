@@ -1,5 +1,5 @@
 /*
-*	 Copyright (C) 2018 Qub³d Engine Group.
+*	 Copyright (C) 2018 QubÂ³d Engine Group.
 *	 All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without modification,
@@ -30,16 +30,68 @@
 
 #pragma once
 
-#include <imgui.h>
+#include <GL/glew.h>
+#include <glm/vec3.hpp>
 
-#include <glm/glm.hpp>
+#include <vector>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
+#include <unordered_map>
 
-// Extend the ImgGUI namespace to use our own custom functions.
-namespace ImGui
+namespace qub3d
 {
-	bool InputVector3(const char* name, glm::vec3 *vector);
-	bool InputVector2(const char *name, glm::vec2 *vector);
-	bool InputVector4(const char *name, glm::vec4 *vector);
+	enum class BlockFace
+	{
+		FRONT = 0,
+		BACK = 1,
+		RIGHT = 2,
+		LEFT = 3,
+		BOTTOM = 4,
+		TOP = 5
+	};
 
-	bool InputMatrix4x4(const char* name, glm::mat4 *matrix);
+	enum class BlockType
+	{
+		AIR,
+		STONE
+	};
+
+	class Chunk
+	{
+	public:
+		typedef std::vector<std::vector<std::vector<BlockType>>> CPUBlockArray;
+
+		Chunk();
+
+		void fill(int size);
+		
+		inline GLuint getVAO() const { return m_vao; }
+		inline GLuint getVBO() const { return m_vbo; }
+		inline GLuint getEBO() const { return m_ebo; }
+
+		void draw();
+
+		void placeBlockAt(int x, int y, int z);
+		void destroyBlockAt(int x, int y, int z);
+		
+		BlockType getBlockAtPos(float x, float y, float z);
+
+	private:
+		void destroyOpenGLData();
+		void setChunkSize(int size);
+		void build();
+
+		void addBlockFace(glm::vec3* vertices, int x, int y, int z, BlockFace face);
+		void removeBlockFace(glm::vec3 *vertices, int x, int y, int z, BlockFace face);
+
+	private:
+		GLuint m_vao, m_vbo, m_ebo, m_tbo;
+		
+		bool m_filled;
+
+		int m_totalVerticesInChunk, m_totalIndicesInChunk, m_totalUvsInChunk;
+		int m_chunkSize;
+
+		CPUBlockArray m_blocks;
+	};
 }

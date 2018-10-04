@@ -1,5 +1,5 @@
 /*
-*	 Copyright (C) 2018 Qub³d Engine Group.
+*	 Copyright (C) 2018 QubÂ³d Engine Group.
 *	 All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without modification,
@@ -30,60 +30,16 @@
 
 #pragma once
 
-#include <qub3d/opengl.hpp>
-
-#include <string>
-#include <vector>
-#include <unordered_map>
+#include <imgui.h>
 
 #include <glm/glm.hpp>
 
-namespace qub3d
+// Extend the ImgGUI namespace to use our own custom functions.
+namespace ImGui
 {
-	enum class ShaderPipelineStage
-	{
-		VERTEX = GL_VERTEX_SHADER,
-		FRAGMENT = GL_FRAGMENT_SHADER
-	};
+	bool InputVector3(const char* name, glm::vec3 *vector);
+	bool InputVector2(const char *name, glm::vec2 *vector);
+	bool InputVector4(const char *name, glm::vec4 *vector);
 
-	class ShaderPipeline
-	{
-	public:
-		void addStage(ShaderPipelineStage stage, const std::string& shaderFilepath);
-		void build();
-
-		void bind();
-		void unbind();
-
-		inline GLuint getProgramID() const { return m_program; }
-
-		void destroy();
-
-		GLint getUniformLocation(const std::string& uniformName);
-
-		void setUniform(const std::string& uniformName, glm::mat4& matrix);
-		void setUniform(const std::string& uniformName, float& value);
-
-		void debugGUI();
-
-		template <typename T>
-		T* getUniformValuePtr(const std::string& uniformName)
-		{
-			return (T*)m_uniformValueMap[uniformName];
-		}
-
-	private:
-		template <typename T>
-		void updateUniformValue(const std::string& name, T& value)
-		{
-			m_uniformValueMap[name] = static_cast<void*>(&value);
-		}
-
-	private:
-		GLuint m_program;
-
-		std::vector<GLuint> m_shaderIDs;
-		std::unordered_map<std::string, GLint> m_uniformLocationMap;
-		std::unordered_map<std::string, void*> m_uniformValueMap;
-	};
+	bool InputMatrix4x4(const char* name, glm::mat4 *matrix);
 }
