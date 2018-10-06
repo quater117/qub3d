@@ -1,0 +1,12 @@
+INCLUDE(FindPkgConfig)
+PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+if(NOT SDL2_FOUND)
+	message(STATUS "Using backup for SDL2")
+	set(SDL2_SOURCES_PATH "${CMAKE_CURRENT_LIST_DIR}/../../libdeps/SDL2")
+	set(SDL2_INCLUDE_DIRS ${SDL2_SOURCES_PATH}/include)
+	set(SDL2_LIBRARIES SDL2)
+	set(VIDEO_WAYLAND OFF)
+	set(WAYLAND_SHARED OFF)
+	add_subdirectory(${SDL2_SOURCES_PATH})
+endif()
+

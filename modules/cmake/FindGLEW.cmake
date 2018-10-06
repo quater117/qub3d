@@ -1,0 +1,10 @@
+INCLUDE(FindPkgConfig)
+PKG_SEARCH_MODULE(GLEW REQUIRED glew)
+if(NOT GLEW_FOUND)
+	message(STATUS "Using backup for GLEW")
+	set(GLEW_SOURCES_PATH "${CMAKE_CURRENT_LIST_DIR}/../../libdeps/glew")
+	set(GLEW_INCLUDE_DIRS ${GLEW_SOURCES_PATH}/include)
+	set(GLEW_LIBRARIES glew_s)
+	add_subdirectory(${GLEW_SOURCES_PATH}/build/cmake)
+endif()
+

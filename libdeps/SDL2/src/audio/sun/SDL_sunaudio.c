@@ -288,7 +288,7 @@ SUNAUDIO_OpenDevice(_THIS, void *handle, const char *devname, int iscapture)
             break;              /* try again */
 
         case AUDIO_ENCODING_LINEAR:
-            /* linear 16bit didn't work either, resort to Âµ-law */
+            /* linear 16bit didn't work either, resort to µ-law */
             enc = AUDIO_ENCODING_ULAW;
             this->spec.channels = 1;
             this->spec.freq = 8000;

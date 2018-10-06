@@ -1,0 +1,10 @@
+INCLUDE(FindPkgConfig)
+PKG_SEARCH_MODULE(YAML_CPP REQUIRED yaml-cpp)
+if(NOT YAML_CPP_FOUND)
+	message(STATUS "Using backup for yaml-cpp")
+	set(YAML_CPP_SOURCES_PATH "${CMAKE_CURRENT_LIST_DIR}/../../libdeps/yaml-cpp")
+	set(YAML_CPP_INCLUDE_DIRS ${YAML_CPP_SOURCES_PATH}/include)
+	set(YAML_CPP_LIBRARIES yaml-cpp)
+	add_subdirectory(${YAML_CPP_SOURCES_PATH})
+endif()
+

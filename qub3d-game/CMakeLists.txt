@@ -1,4 +1,4 @@
-﻿#
+#
 #	 Copyright (C) 2018 Qub³d Engine Group.
 #	 All rights reserved.
 #
@@ -27,75 +27,66 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+#
 
 # Use this version because it adds some options that we use.
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.0)
 
 project(qub3d-game)
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # Set include, library, and source directories.
 
-set(libdeps ${CMAKE_CURRENT_LIST_DIR}/../libdeps)
+if(UNIX)
+	find_package(X11 REQUIRED)
+endif()
+
+set(OpenGL_GL_PREFERENCE "LEGACY")
+find_package(OpenGL REQUIRED)
+#find_package(SDL2 REQUIRED)
+#find_package(GLM REQUIRED)
+#find_package(GLEW REQUIRED)
+#find_package(IMGUI REQUIRED)
+
+#set(PLATFORM_LIBS -lpthread ${CMAKE_DL_LIBS})
 
 set(source_dir ${PROJECT_SOURCE_DIR}/src)
-set(headers_dir ${PROJECT_SOURCE_DIR}/include/qub3d)
+set(headers_dir ${PROJECT_SOURCE_DIR}/include)
 
 set(client_sources
 	${source_dir}/main.cpp
 	${source_dir}/window.cpp
-	${source_dir}/shader_pipeline.cpp
 	${source_dir}/io.cpp
 	${source_dir}/imgui.cpp
-	${source_dir}/fly_cam.cpp
 	${source_dir}/chunk.cpp
+	${source_dir}/fly_cam.cpp
+	${source_dir}/shader_pipeline.cpp
+	${headers_dir}/qub3d/opengl.hpp
+	${headers_dir}/qub3d/shader_pipeline.hpp
+	${headers_dir}/qub3d/io.hpp
+	${headers_dir}/qub3d/imgui.hpp
+	${headers_dir}/qub3d/fly_cam.hpp
+	${headers_dir}/qub3d/chunk.hpp
 	${source_dir}/texture.cpp
 )
 
-set(clientHeaders
-	${headers_dir}/window.hpp
-	${headers_dir}/opengl.hpp
-	${headers_dir}/shader_pipeline.hpp
-	${headers_dir}/io.hpp
-	${headers_dir}/imgui.hpp
-	${headers_dir}/fly_cam.hpp
-	${headers_dir}/chunk.hpp
-	${headers_dir}/texture.hpp
-	${headers_dir}/stb_image.h
+include_directories(
+#	${X11_INCLUDE_DIR}
+	${ENTT_INCLUDE_DIR}
+	${IMGUI_INCLUDE_DIR}
+	${GLEW_INCLUDE_DIRS}
+	${GLM_INCLUDE_DIRS}
+	${SDL2_INCLUDE_DIRS}
+	${YAML_CPP_INCLUDE_DIRS}
+	${headers_dir}
 )
 
-if(APPLE)
-  message(STATUS "Including SDL2 dependency frameworks for macOS")
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -framework CoreAudio -framework AudioToolbox -framework CoreFoundation -framework CoreGraphics -framework CoreVideo -framework ForceFeedback -framework IOKit -framework Carbon -framework AppKit -framework OpenGL -liconv")
-endif()# APPLE
-
-set(include_dirs
-        ${libdeps}/glew/include
-        ${libdeps}/glm
-        ${libdeps}/SDL2/include
-        ${libdeps}/yaml-cpp/include
-        ${libdeps}/ImGUI/
-        ${source_dir}/../include
-)
-
-set(library_dirs
-    glew_s
-    yaml-cpp
-    SDL2-static
-    SDL2main
-)
-
-if (UNIX AND NOT APPLE)
-  find_package(X11 REQUIRED)
-	find_package(Threads REQUIRED)
-	list(APPEND library_dirs
-		${CMAKE_DL_LIBS}
-        	${CMAKE_THREAD_LIBS_INIT}
-        	${X11_LIBRARIES}
-        	${X11_Xxf86vm_LIB}
-        	GL
-	)
-
-endif()
+#if(APPLE)
+#  message(STATUS "Including SDL2 dependency frameworks for macOS")
+#  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -framework CoreAudio -framework AudioToolbox -framework CoreFoundation -framework CoreGraphics -framework CoreVideo -framework ForceFeedback -framework IOKit -framework Carbon -framework AppKit -framework OpenGL -liconv")
+#endif()# APPLE
 
 if(WIN32)
 	list(APPEND library_dirs 
@@ -106,29 +97,22 @@ if(WIN32)
 		opengl32.lib
 		version.lib
 		winmm.lib
-    )
+   )
 endif()# WIN32
-
+ 
 # Link the "SandBlox" binary.
 
-add_executable(qub3d-game ${client_sources} ${clientHeaders})
-
-file(GLOB shaders ${CMAKE_CURRENT_SOURCE_DIR}/../assets/shaders/*.vert ${CMAKE_CURRENT_SOURCE_DIR}/../assets/shaders/*.frag)
-
-add_custom_target(assets
-                   COMMAND ${CMAKE_COMMAND} -E copy_directory
-                   ${CMAKE_CURRENT_SOURCE_DIR}/../assets ${CMAKE_CURRENT_BINARY_DIR}/assets
-				   SOURCES ${shaders}
-)
-source_group("shaders" FILES ${shaders})
-
-add_dependencies(qub3d-game assets)
-
-set_target_properties(qub3d-game PROPERTIES
-    CXX_STANDARD 11
-    CXX_STANDARD_REQUIRED ON
-    CXX_EXTENSIONS OFF
+add_executable(${PROJECT_NAME} ${client_sources})
+set(qub3d_LIBS
+	${PROJECT_NAME}
+	${ENTT_LIBRARIES}
+	${IMGUI_LIBRARIES}
+	${GLEW_LIBRARIES}
+	${GLM_LIBRARIES}
+	${SDL2_LIBRARIES}
+	${YAML_CPP_LIBRARIES}
+	${X11_LIBRARIES}
+	GL
 )
 
-include_directories(${include_dirs})
-target_link_libraries(qub3d-game ${library_dirs} imgui)
+target_link_libraries(${qub3d_LIBS})
